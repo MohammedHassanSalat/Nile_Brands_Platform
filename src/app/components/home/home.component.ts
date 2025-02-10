@@ -8,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  image2Path:string="images/nile brand 2.jpg";
+  image2Path:string="images/nile brand 2.svg";
 }
