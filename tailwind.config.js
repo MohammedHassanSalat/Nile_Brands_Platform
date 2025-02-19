@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         'primary': "#033555",
         'secondary': "#828282",
+        'thrid': "#70CEAF",
         'fontColor': "#242526",
       },
       animation: {

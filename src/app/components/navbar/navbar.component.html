@@ -1,53 +1,55 @@
-<nav class="bg-white border-b border-gray-200 dark:bg-[#242526] dark:border-[#242526] shadow-md">
-<div class="max-w-screen-xl flex justify-between items-center mx-auto p-2">
-
-
+<nav *ngIf="!hideNavbar" #navbar class="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 dark:bg-[#242526] dark:border-[#242526] shadow-md transition-all duration-300 navbar-hidden">
+  <div class="max-w-screen-xl flex justify-between items-center mx-auto p-2">
     <!-- Logo Section -->
-    <img [src]="imagePath" alt="Logo" class="w-20 h-20" />
+    <a routerLink="/home">
+      <img [src]="imagePath" alt="Logo" class="w-12 h-12 sm:w-16 sm:h-16" />
+    </a>
 
-    <!-- Search Bar Section -->
-    <form class="flex items-center w-1/3">
+    <!-- Search Bar -->
+    <form class="flex items-center w-32 xs:w-40 sm:w-52 md:w-64 lg:w-80 xl:w-96">
       <div class="relative w-full">
-        <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#242526] dark:text-[#242526]">
-          <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+        <div class="absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3 text-fontColor dark:text-white">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
           </svg>
         </div>
-        <input type="search" id="default-search"
-          class="block w-full px-4 py-2 pl-10 text-sm text-[#242526] border border-gray-300 rounded-lg bg-gray-50
-          focus:ring-0 focus:border-green-300 outline-none dark:bg-[#242526] dark:border-[#242526] dark:text-white
-          dark:placeholder-[#242526] dark:focus:ring-0 dark:focus:border-green-300 transition-all ease-in-out duration-300"
+        <input type="search"
+          class="block w-full px-2 sm:px-3 py-1 sm:py-2 pl-8 sm:pl-10 text-xs sm:text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-0 focus:border-primary outline-none dark:bg-fontColor dark:border-fontColor dark:text-white dark:placeholder-fontColor transition-all duration-300"
           placeholder="What are you looking for?" required />
       </div>
     </form>
 
-    <!-- User, Wishlist, and Cart Section -->
-    <div class="flex space-x-8 items-center">
-      <!-- Sign in -->
-      <div class="relative group">
-        <a href="#" class="text-lg font-bold text-[#033555] hover:text-green-400 dark:text-[#033555] dark:hover:text-green-400 transition duration-300 flex items-center">
-          sign in
-        </a>
-      </div>
+    <!-- Icons Section -->
+    <div class="flex items-center space-x-2 sm:space-x-4">
+      <!-- Sign In-->
+      <a routerLink="/signin" class="text-sm sm:text-lg font-normal text-primary hover:font-bold transition duration-300">
+        Sign in
+      </a>
 
-      <!-- Wishlist -->
-      <a href="#" class="text-lg text-[#242526] hover:text-green-400 dark:text-green-400 dark:hover:text-green-400 transition duration-300 flex items-center">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
+      <!-- Wishlist Icon -->
+      <a routerLink="/wishlist" class="text-lg transition duration-300 flex items-center">
+        <svg class="w-6 h-6 transition-all duration-300" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path class="stroke-fontColor fill-transparent hover:fill-primary transition-all duration-300"
+            stroke-width="1" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81
+            4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       </a>
 
-<!-- Cart Icon -->
-      <a href="#" class="text-lg text-gray-800 hover:text-[#242526] focus:text-[#242526] active:text-[#242526]
-          dark:text-white dark:hover:text-[#242526] dark:focus:text-[#242526] dark:active:text-[#242526]
-          transition-all duration-300 flex items-center">
-        <svg class="w-7 h-7 text-[#242526] hover:text-green-400 transform hover:scale-110 active:scale-110 focus:scale-110 transition-all duration-300"
-          aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
+      <!-- Cart Icon -->
+      <a routerLink="/cart" class="text-lg transition-all flex items-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+             class="w-5 h-5 transition-all duration-300 fill- hover:fill-primary">
+          <g clip-path="url(#clip0_384_1711)">
+            <path d="M24 4V5H16V4H24ZM9 22C9 23.1 8.1 24 7 24C5.9 24 5 23.1 5 22C5 20.9 5.9 20 7 20C8.1 20 9 20.9 9 22ZM8 22C8 21.45
+            7.55 21 7 21C6.45 21 6 21.45 6 22C6 22.55 6.45 23 7 23C7.55 23 8 22.55 8 22ZM19 22C19 23.1 18.1 24 17 24C15.9 24 15 23.1
+            15 22C15 20.9 15.9 20 17 20C18.1 20 19 20.9 19 22ZM18 22C18 21.45 17.55 21 17 21C16.45 21 16 21.45 16 22C16 22.55 16.45 23
+            17 23C17.55 23 18 22.55 18 22ZM20.94 14H5.88L4.63 5H13V4H4.49L4.23 2.16C4.06 0.93 3 0 1.76 0H0V1H1.76C2.51 1 3.14 1.56
+            3.25 2.29L5.27 16.84C5.44 18.07 6.5 19 7.75 19H20.01V18H7.74C6.99 18 6.36 17.44 6.25 16.71L6.01 15H21.75L23.15 8H22.13L20.93
+            14H20.94Z"/>
+          </g>
         </svg>
       </a>
-</div>
-</div>
+    </div>
+  </div>
 </nav>
-

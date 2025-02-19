@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-wishlist',
+  selector: 'app-wishlits',
   standalone: true,
   imports: [],
   templateUrl: './wishlist.component.html',
