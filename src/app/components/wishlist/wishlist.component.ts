@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-wishlits',
+  selector: 'app-wishlist',
   standalone: true,
-  imports: [],
   templateUrl: './wishlist.component.html',
   styleUrl: './wishlist.component.css'
 })
 export class WishlistComponent {
-
+  wishlistImage: string = 'images/images ui/empty wishlist.jpg';
 }

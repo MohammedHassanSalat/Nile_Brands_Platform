@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
@@ -9,84 +10,29 @@ import { CommonModule } from '@angular/common';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
-  image2Path: string = "images/images ui/home page.svg";
-
+  image2Path: string = 'images/images ui/home page.svg';
   products: any[] = [];
-  clothingProducts: any[] = [];
-  accessoriesProducts: any[] = [];
-  footwearProducts: any[] = [];
+  filteredProducts: any[] = [];
+  apiUrl = 'https://fakestoreapi.com/products';
+  selectedCategory: string = 'All';
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.fetchProducts();
   }
 
   fetchProducts() {
-    setTimeout(() => {
-      this.products = [
-        {
-          name: 'Souvenir',
-          price: 250,
-          image: 'images/products details/product 1.jpg',
-          description: 'A beautifully crafted souvenir that captures the essence of tradition and culture. Perfect as a keepsake or a thoughtful gift.'
-      },
-      {
-          name: 'Handmade Necklace',
-          price: 300,
-          image: 'images/products details/product 3.jpg',
-          description: 'A stunning handmade necklace designed with intricate details, adding elegance to any outfit. Crafted with love and care.'
-      },
+    this.http.get<any[]>(this.apiUrl).subscribe((data) => {
+      this.products = data;
+      this.filteredProducts = [...this.products];
+    });
+  }
 
-      {
-          name: 'Sandals',
-          price: 500,
-          image: 'images/products details/product 2.jpg',
-          description: 'Stylish and comfortable sandals made with high-quality materials. Perfect for casual outings or beachwear.'
-      },
-      {
-          name: 'Souvenir',
-          price: 150,
-          image: 'images/products details/product 4.jpg',
-          description: 'A charming and affordable souvenir that makes for a great travel memory or gift for loved ones.'
-      },
-      {
-          name: 'Tea Set',
-          price: 450,
-          image: 'images/products details/product 5.jpg',
-          description: 'A beautifully designed tea set that enhances your tea-drinking experience. Ideal for both personal use and as a thoughtful gift.'
-      },
-      {
-        name: 'Souvenir',
-        price: 150,
-        image: 'images/products details/product 4.jpg',
-        description: 'A charming and affordable souvenir that makes for a great travel memory or gift for loved ones.'
-      },
-      {
-        name: 'Souvenir',
-        price: 150,
-        image: 'images/products details/product 4.jpg',
-        description: 'A charming and affordable souvenir that makes for a great travel memory or gift for loved ones.'
-      },
-      {
-        name: 'Souvenir',
-        price: 150,
-        image: 'images/products details/product 4.jpg',
-        description: 'A charming and affordable souvenir that makes for a great travel memory or gift for loved ones.'
-      },
-      {
-        name: 'Souvenir',
-        price: 150,
-        image: 'images/products details/product 4.jpg',
-        description: 'A charming and affordable souvenir that makes for a great travel memory or gift for loved ones.'
-      },
-      {
-        name: 'Souvenir',
-        price: 150,
-        image: 'images/products details/product 4.jpg',
-        description: 'A charming and affordable souvenir that makes for a great travel memory or gift for loved ones.'
-      },
-      ];
-    }, 1000);
+  filterCategory(category: string) {
+    this.selectedCategory = category;
+    this.filteredProducts = category === 'All'
+      ? [...this.products]
+      : this.products.filter(p => p.category === category);
   }
 }
