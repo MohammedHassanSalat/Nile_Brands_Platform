@@ -16,9 +16,9 @@ export class HomeComponent implements OnInit {
   filteredProducts: any[] = [];
   apiUrl = 'https://fakestoreapi.com/products';
   selectedCategory: string = 'All';
-  visibleProductsCount = 10; // Initially display 10 products
+  visibleProductsCount = 10;
 
-  constructor(private http: HttpClient, private wishlistService: WishlistService) {}
+  constructor(private http: HttpClient, public wishlistService: WishlistService) {}
 
   ngOnInit() {
     this.fetchProducts();
@@ -39,8 +39,8 @@ export class HomeComponent implements OnInit {
     this.visibleProductsCount = 10; // Reset count on category change
   }
 
-  toggleWishlist(productId: number) {
-    this.wishlistService.toggleWishlist(productId);
+  toggleWishlist(product: any) {
+    this.wishlistService.toggleWishlist(product);
   }
 
   isInWishlist(productId: number): boolean {
@@ -48,6 +48,6 @@ export class HomeComponent implements OnInit {
   }
 
   seeMore() {
-    this.visibleProductsCount += 10; // Load 10 more products
+    this.visibleProductsCount += 10;
   }
 }

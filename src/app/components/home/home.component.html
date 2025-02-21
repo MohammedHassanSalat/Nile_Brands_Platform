@@ -11,57 +11,56 @@
       </h1>
     </div>
   </section>
-</div>
 
-<!-- Dynamic Categories -->
-<div class="container mx-auto flex flex-wrap justify-center gap-2 sm:gap-4 pt-6 text-xs sm:text-sm md:text-base">
-  <a
-    *ngFor="let category of ['All', 'men\'s clothing', 'women\'s clothing', 'jewelery', 'electronics']"
-    (click)="filterCategory(category)"
-    class="cursor-pointer transition-all duration-300 ease-in-out"
-    [ngClass]="selectedCategory === category ? 'text-primary font-semibold' : 'text-fontColor font-normal hover:font-bold hover:scale-105'">
-    {{ category.charAt(0).toUpperCase() + category.slice(1) }}
-  </a>
-</div>
+  <!-- Dynamic Categories -->
+  <div class="container mx-auto flex flex-wrap justify-center gap-2 sm:gap-4 pt-6 text-xs sm:text-sm md:text-base">
+    <a *ngFor="let category of ['All', 'men\'s clothing', 'women\'s clothing', 'jewelery', 'electronics']"
+      (click)="filterCategory(category)"
+      class="cursor-pointer transition-all duration-300 ease-in-out"
+      [ngClass]="selectedCategory === category ? 'text-primary font-semibold' : 'text-fontColor font-normal hover:font-bold hover:scale-105'">
+      {{ category.charAt(0).toUpperCase() + category.slice(1) }}
+    </a>
+  </div>
 
-<!-- Product Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-6 mt-7">
-  <div class="w-full bg-gray-300 rounded-md shadow-lg p-3 relative" *ngFor="let product of filteredProducts.slice(0, visibleProductsCount)">
+  <!-- Product Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-6 mt-7">
+    <div class="w-full bg-gray-300 rounded-md shadow-lg p-3 relative" *ngFor="let product of filteredProducts.slice(0, visibleProductsCount)">
+      <!-- Image Section -->
+      <div class="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden rounded-md">
+        <img [src]="product.image" alt="{{ product.title }}" class="w-full h-full object-cover rounded-md p-1" />
 
-    <!-- Image Section -->
-    <div class="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden rounded-md">
-      <img [src]="product.image" alt="{{ product.title }}" class="w-full h-full object-cover rounded-md p-1" />
-
-      <!-- Wishlist (Heart) Icon -->
-      <button (click)="toggleWishlist(product.id)" class="absolute top-2 right-2 text-lg transition-all"
-        [ngClass]="isInWishlist(product.id) ? 'text-[#A61717]' : 'text-fontColor hover:text-[#A61717]'">
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 13 12" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3.6717 0.634945C4.32061 0.634945 4.95186 0.800949 5.5135 1.13046C5.91505 1.36646 6.24808 1.66847 6.49972 2.01448C6.75136 1.66847 7.08438 1.36646 7.48594 1.13046C8.5348 0.515441 9.82299 0.470439 11.0212 1.00896C11.5545 1.24846 12.0058 1.61297 12.3265 2.06298C14.1983 4.68856 11.3409 8.31816 8.04222 10.8392C7.14756 11.5228 5.85081 11.5223 4.95721 10.8392C1.65857 8.31816 -1.1989 4.68806 0.673422 2.06298C0.99413 1.61297 1.44494 1.24846 1.97874 1.00896C2.5345 0.758947 3.11006 0.634444 3.6717 0.634444V0.634945Z"/>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Product Details -->
-    <div class="p-3">
-      <p class="font-bold text-lg text-fontColor break-words">
-        {{ product.title.length > 15 ? (product.title | slice:0:15) + '...' : product.title }}
-      </p>
-      <div class="flex justify-between items-center mt-2">
-        <p class="font-semibold text-fontColor text-lg">{{ product.price }} EGP</p>
-        <button class="bg-transparent text-fontColor text-lg">
-          <svg class="w-8 h-6 text-fontColor transition-all duration-300 hover:fill-primary"
-            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 21" fill="currentColor">
-            <path d="M11.5362 18.6862C11.5362 19.5984 12.1984 20.3448 13.0077 20.3448C13.8171 20.3448 14.4792 19.5984 14.4792 18.6862C14.4792 17.7739 13.8171 17.0275 13.0077 17.0275C12.1984 17.0275 11.5362 17.7739 11.5362 18.6862ZM5.65028 17.0275C6.4596 17.0275 7.12177 17.7739 7.12177 18.6862C7.12177 19.5984 6.4596 20.3448 5.65028 20.3448C4.84096 20.3448 4.17879 19.5984 4.17879 18.6862C4.17879 17.7739 4.84096 17.0275 5.65028 17.0275ZM6.38603 2.92928V4.5879H0.500065V2.92928H6.38603ZM3.31797 11.2224H14.1702L14.8618 4.5879H7.85752V2.92928H15.0384L15.0678 2.63902C15.2003 1.38676 16.142 0.441345 17.2603 0.441345H18.158V2.09997H17.2603C16.8851 2.09997 16.5761 2.4151 16.532 2.82976L15.3695 14.0006C15.237 15.2528 14.2953 16.1982 13.177 16.1982H3.4504V14.5396H13.1696C13.5448 14.5396 13.8538 14.2245 13.898 13.8098L13.9936 12.881H2.09663L1.16224 7.07583H2.6558L3.32533 11.2224H3.31797Z"/>
+        <!-- Wishlist Icon -->
+        <button (click)="toggleWishlist(product)" class="absolute top-2 right-2 text-lg transition-all"
+          [ngClass]="isInWishlist(product.id) ? 'text-[#A61717]' : 'text-fontColor hover:text-[#A61717]'">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 13 12" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.6717 0.634945C4.32061 0.634945 4.95186 0.800949 5.5135 1.13046C5.91505 1.36646 6.24808 1.66847 6.49972 2.01448C6.75136 1.66847 7.08438 1.36646 7.48594 1.13046C8.5348 0.515441 9.82299 0.470439 11.0212 1.00896C11.5545 1.24846 12.0058 1.61297 12.3265 2.06298C14.1983 4.68856 11.3409 8.31816 8.04222 10.8392C7.14756 11.5228 5.85081 11.5223 4.95721 10.8392C1.65857 8.31816 -1.1989 4.68806 0.673422 2.06298C0.99413 1.61297 1.44494 1.24846 1.97874 1.00896C2.5345 0.758947 3.11006 0.634444 3.6717 0.634444V0.634945Z"/>
           </svg>
         </button>
       </div>
+
+      <!-- Product Details -->
+      <div class="p-3">
+        <p class="font-bold text-lg text-fontColor break-words">
+          {{ product.title.length > 15 ? (product.title | slice:0:15) + '...' : product.title }}
+        </p>
+        <div class="flex justify-between items-center mt-2">
+          <p class="font-semibold text-fontColor text-lg">{{ product.price }} EGP</p>
+          <!-- cart icon -->
+          <button class="bg-transparent text-fontColor text-lg">
+            <svg class="w-8 h-6 text-fontColor transition-all duration-300 hover:fill-primary"
+              aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 21" fill="currentColor">
+              <path d="M11.5362 18.6862C11.5362 19.5984 12.1984 20.3448 13.0077 20.3448C13.8171 20.3448 14.4792 19.5984 14.4792 18.6862C14.4792 17.7739 13.8171 17.0275 13.0077 17.0275C12.1984 17.0275 11.5362 17.7739 11.5362 18.6862ZM5.65028 17.0275C6.4596 17.0275 7.12177 17.7739 7.12177 18.6862C7.12177 19.5984 6.4596 20.3448 5.65028 20.3448C4.84096 20.3448 4.17879 19.5984 4.17879 18.6862C4.17879 17.7739 4.84096 17.0275 5.65028 17.0275ZM6.38603 2.92928V4.5879H0.500065V2.92928H6.38603ZM3.31797 11.2224H14.1702L14.8618 4.5879H7.85752V2.92928H15.0384L15.0678 2.63902C15.2003 1.38676 16.142 0.441345 17.2603 0.441345H18.158V2.09997H17.2603C16.8851 2.09997 16.5761 2.4151 16.532 2.82976L15.3695 14.0006C15.237 15.2528 14.2953 16.1982 13.177 16.1982H3.4504V14.5396H13.1696C13.5448 14.5396 13.8538 14.2245 13.898 13.8098L13.9936 12.881H2.09663L1.16224 7.07583H2.6558L3.32533 11.2224H3.31797Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- See More Button -->
-<div class="flex justify-center my-10" *ngIf="visibleProductsCount < filteredProducts.length">
-  <button (click)="seeMore()" class="px-4 py-2 bg-[#B7D6C6] text-fontColor text-lg font-bold rounded-lg hover:bg-primary hover:text-white transition-all">
-    See more..
-  </button>
+  <!-- See More Button -->
+  <div class="flex justify-center my-10" *ngIf="visibleProductsCount < filteredProducts.length">
+    <button (click)="seeMore()" class="px-4 py-2 bg-[#B7D6C6] text-fontColor text-lg font-bold rounded-lg hover:bg-primary hover:text-white transition-all">
+      See more..
+    </button>
+  </div>
 </div>

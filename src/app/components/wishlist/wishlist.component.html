@@ -1,3 +1,4 @@
+  <!-- Empty Wishlist -->
   <div *ngIf="wishlistService.getWishlist().length === 0" class="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
     <svg class="w-[100%] max-w-md h-auto" viewBox="0 0 589 495" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="650" height="495" fill="url(#pattern0_384_2085)"/>
@@ -10,11 +11,48 @@
     </svg>
     <h2 class="text-xl sm:text-2xl font-bold text-[#004371] mt-7 -ml-2.5">Empty Wishlist</h2>
   </div>
-  <!-- ccc -->
+
+  <!-- Wishlist Products Grid -->
   <div class="w-full pt-16 sm:pt-20">
   <div class="container mx-auto p-6">
-  <div *ngFor="let productId of wishlistService.getWishlist()" class="p-4 border-b flex justify-between items-center">
-    <p>Product ID: {{ productId }}</p>
-    <button (click)="removeFromWishlist(productId)" class="text-red-500 hover:underline">Remove</button>
+  <div class="flex flex-wrap gap-x-24 gap-y-6 justify-start">
+    <div
+      *ngFor="let product of wishlist"
+      class="relative flex items-center bg-white p-4 shadow-md rounded-lg w-[342px] h-[148px] border border-gray-200"
+    >
+      <!-- Delete icon -->
+      <button
+        (click)="removeFromWishlist(product.id)"
+        class="absolute top-2 right-2 text-red-600 text-xl hover:text-red-800"
+      >
+
+      </button>
+            <!-- Remove Button -->
+            <button (click)="removeFromWishlist(product.id)"
+            class="absolute top-2 right-2 text-red-600 font-semibold hover:text-red-800 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+
+      <!-- Product Image -->
+      <img [src]="product.image" alt="{{ product.title }}" class="w-[80px] h-[80px] object-cover rounded-lg" />
+
+      <!-- Product Info -->
+      <div class="flex flex-col flex-1 ml-3">
+        <h3 class="text-sm font-semibold text-fontColor leading-tight">{{ product.title |slice: 0:25 }}...</h3>
+        <p class="text-xs text-[#8C8A8A]">{{ product.category }}</p>
+        <p class="text-xs text-[#000000CC] mt-1 line-clamp-2">{{ product.description | slice: 0:50 }}...</p>
+
+        <!-- Price and Add to Cart Button -->
+        <div class="flex justify-between items-center mt-2">
+          <p class="font-semibold text-sm text-[#000000CC]">{{ product.price }} LE</p>
+          <button class="bg-primary text-[#FFFFFF] px-3 py-1 rounded-md text-xs hover:bg-primary">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
