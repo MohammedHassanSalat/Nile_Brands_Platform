@@ -15,7 +15,13 @@ export class NavbarComponent {
 
   @ViewChild('navbar') navbar!: ElementRef;
   private lastScrollTop = 0;
-  private hiddenRoutes = ['/signin', '/resetpassword', '/forgetpassword', '/register'];
+  private hiddenRoutes = [
+    '/signin',
+    '/resetpassword',
+    '/forgetpassword',
+    '/register',
+    '/verifyemail',
+  ];
 
   constructor(private router: Router) {
     this.router.events.subscribe(() => {

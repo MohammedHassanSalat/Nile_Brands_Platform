@@ -6,7 +6,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { LoginComponent } from './components/login/login.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { CartComponent } from './components/cart/cart.component';
-import { ChatbotComponent } from './components/chatbot/chatbot.component';
+import { VerifyemailComponent } from './components/verifyemail/verifyemail.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -14,6 +14,7 @@ export const routes: Routes = [
   { path: 'register', component: SignupComponent },
   { path: 'forgetpassword', component: ForgetPasseordComponent },
   { path: 'resetpassword', component: ResetPasswordComponent },
+  { path: 'verifyemail', component: VerifyemailComponent },
   { path: 'signin', component: LoginComponent },
   { path: 'wishlist', component: WishlistComponent },
   { path: 'cart', component: CartComponent},
