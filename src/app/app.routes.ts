@@ -8,6 +8,7 @@ import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { CartComponent } from './components/cart/cart.component';
 import { VerifyemailComponent } from './components/verifyemail/verifyemail.component';
 import { EditprofileComponent } from './components/editprofile/editprofile.component';
+import { FeedbackComponent } from './components/feedback/feedback.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -20,5 +21,6 @@ export const routes: Routes = [
   { path: 'wishlist', component: WishlistComponent },
   { path: 'cart', component: CartComponent},
   { path: 'editprofile', component: EditprofileComponent},
+  { path: 'feedback', component: FeedbackComponent},
 ];
 

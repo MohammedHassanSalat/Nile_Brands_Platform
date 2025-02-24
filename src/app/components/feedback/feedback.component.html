@@ -1,0 +1,44 @@
+<div class="flex flex-col gap-4 justify-center mx-auto min-h-screen max-w-[1200px]">
+  <div>
+    <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor mt-20">Feedback</h2>
+  </div>
+
+  <div class="grid justify-center p-6 bg-white shadow-md border rounded-lg border-fontColor">
+    <div class="flex flex-col gap-1 mt-6">
+      <div class="w-[100px] h-[100px] mx-auto">
+        <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
+      </div>
+      <div class="text-center">
+        <p class="text-[16px] font-[500] text-fontColor">Esraa Ali</p>
+        <p class="text-[20px] sm:text-[30px] font-[700] text-fontColor">We're Listening!</p>
+        <p class="text-[17px] sm:text-[27px] font-[400] text-fontColor">Your feedback is essential in making our app better.
+          <br> Please take a moment to share your thoughts with us.
+        </p>
+      </div>
+    </div>
+
+    <form class="mt-6">
+      <div class="grid grid-cols-5 justify-items-center max-w-[50%] mx-auto">
+        <svg *ngFor="let star of stars; let i = index" (click)="setRating(i + 1)" (mouseover)="hoverRating(i + 1)"
+          (mouseleave)="resetHover()" [attr.fill]="(i + 1) <= (hoveredRating || rating) ? '#F5E426' : '#D9D9D9'"
+          class="cursor-pointer transition-all duration-200 ease-in-out" width="35" height="32" viewBox="0 0 35 32"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M17.5 0L21.429 12.0922L34.1435 12.0922L23.8572 19.5656L27.7862 31.6578L17.5 24.1844L7.21376 31.6578L11.1428 19.5656L0.85651 12.0922L13.571 12.0922L17.5 0Z" />
+        </svg>
+
+      </div>
+
+      <div class="mt-4">
+        <textarea class="resize-none overflow-hidden w-full h-full p-4 text-[20px] sm:text-[30px] text-[#03355582] leading-normal border-none bg-[#D9D9D9] rounded-[19px] mx-auto block">Tell Us How We Can Enhance Your Experience?
+        </textarea>
+      </div>
+
+      <div class="mt-4">
+        <button class="px-12 py-2 text-[16px] text-white bg-primary rounded-[16px] mx-auto block">
+          Submit My Feedback
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
