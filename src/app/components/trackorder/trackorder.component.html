@@ -1,0 +1,35 @@
+<div class="flex flex-col gap-6 justify-center mx-auto min-h-screen max-w-[1200px]">
+  <div>
+    <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor">Track My Order</h2>
+  </div>
+
+  <div class="p-6 bg-white shadow-md border rounded-lg border-fontColor flex gap-6">
+
+    <!-- Left Section (Timeline) -->
+    <div class="flex flex-col items-center relative w-[80px] mt-5">
+      <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center">
+        <div class="w-10 h-10 flex items-center justify-center text-[30px] text-primary font-[700] bg-[#b5b5b5] rounded-full border-2 border-primary" [class.bg-primary]="i < currentStep"
+          [class.border-primary]="i < currentStep" [class.text-secondary]="i >= currentStep">
+          {{ i + 1 }}
+        </div>
+        <!-- <div *ngIf="i < steps.length - 1" [class.bg-primary]="i < currentStep" class="h-28 w-[3px] bg-primary"></div> -->
+        <div *ngIf="i < steps.length - 1" class="h-20 sm:h-28 w-[2px] border-l-4 border-dotted"
+          [ngClass]="{ 'border-primary': i < currentStep, 'border-gray-400': i >= currentStep }">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Section (Order Status) -->
+    <div class="flex flex-col gap-6">
+      <div *ngFor="let step of steps; let i = index" class="flex items-center gap-12">
+        <img [src]="step.image" class="w-0 sm:w-[200px]" alt="Step Image">
+        <div>
+          <p class="font-bold text-[18px]  sm:text-[20px]">{{ step.title }}</p>
+          <p class="text-[16px] text-gray-600">{{ step.description }}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
