@@ -1,0 +1,42 @@
+<div class="flex flex-col gap-4 justify-center mx-auto  min-h-screen max-w-[1200px]">
+  <div>
+    <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor">Edit profile</h2>
+  </div>
+
+  <div class="p-6 bg-white shadow-md border rounded-lg border-fontColor">
+    <div class="mt-6">
+      <div class="w-[100px] h-[100px]">
+        <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
+      </div>
+    </div>
+
+    <form class="mt-6">
+      <div class="relative">
+        <label for="username"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Name</label>
+        <input type="text" id="username"
+          class="block max-sm:w-full sm:w-[50%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+      </div>
+
+      <div class="relative mt-4">
+        <label for="email"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">E-mail</label>
+        <input type="email" id="email"
+          class="block max-sm:w-full sm:w-[50%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+      </div>
+
+      <div class="relative mt-4">
+        <label for="password"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Password</label>
+        <input type="password" id="password"
+          class="block max-sm:w-full sm:w-[50%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+      </div>
+
+      <div class="mt-6 sm:text-right">
+        <button class="px-12 py-2 text-[16px] text-white bg-primary rounded-[16px]">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
