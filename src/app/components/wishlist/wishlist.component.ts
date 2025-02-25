@@ -10,6 +10,7 @@ import { WishlistService } from './wishlist.service';
   styleUrl: './wishlist.component.css'
 })
 export class WishlistComponent implements OnInit {
+  empty_wishlist: string = 'images/images ui/empty wishlist.svg';
   wishlist: any[] = [];
 
   constructor(public wishlistService: WishlistService) {}

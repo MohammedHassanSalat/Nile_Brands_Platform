@@ -11,7 +11,7 @@ import { WishlistService } from '../wishlist/wishlist.service';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
-  image2Path: string = 'images/images ui/home page.svg';
+  home_page: string = 'images/images ui/home.jpg';
   products: any[] = [];
   filteredProducts: any[] = [];
   apiUrl = 'https://fakestoreapi.com/products';
@@ -36,7 +36,7 @@ export class HomeComponent implements OnInit {
     this.filteredProducts = category === 'All'
       ? [...this.products]
       : this.products.filter(p => p.category === category);
-    this.visibleProductsCount = 10; // Reset count on category change
+    this.visibleProductsCount = 10;
   }
 
   toggleWishlist(product: any) {

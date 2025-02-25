@@ -6,7 +6,20 @@ import { Injectable } from '@angular/core';
 export class WishlistService {
   private wishlist: any[] = [];
 
-  constructor() {}
+  constructor() {
+    this.loadWishlistFromStorage(); 
+  }
+
+  private loadWishlistFromStorage() {
+    const storedWishlist = localStorage.getItem('wishlist');
+    if (storedWishlist) {
+      this.wishlist = JSON.parse(storedWishlist);
+    }
+  }
+
+  private saveWishlistToStorage() {
+    localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
+  }
 
   getWishlist() {
     return this.wishlist;
@@ -15,17 +28,18 @@ export class WishlistService {
   addToWishlist(product: any) {
     if (!this.isInWishlist(product.id)) {
       this.wishlist.push(product);
+      this.saveWishlistToStorage(); 
     }
   }
 
   removeFromWishlist(productId: number) {
     this.wishlist = this.wishlist.filter(item => item.id !== productId);
+    this.saveWishlistToStorage();
   }
 
   isInWishlist(productId: number): boolean {
     return this.wishlist.some(item => item.id === productId);
   }
-
 
   toggleWishlist(product: any) {
     if (this.isInWishlist(product.id)) {
