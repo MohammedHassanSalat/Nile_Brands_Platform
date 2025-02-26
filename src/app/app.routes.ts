@@ -10,6 +10,7 @@ import { VerifyemailComponent } from './components/verifyemail/verifyemail.compo
 import { EditprofileComponent } from './components/editprofile/editprofile.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { TrackorderComponent } from './components/trackorder/trackorder.component';
+import { ProductdetailsComponent } from './components/productdetails/productdetails.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -24,5 +25,6 @@ export const routes: Routes = [
   { path: 'editprofile', component: EditprofileComponent },
   { path: 'feedback', component: FeedbackComponent },
   { path: 'trackorder', component: TrackorderComponent },
+  { path: 'productdetails', component: ProductdetailsComponent },
 ];
 

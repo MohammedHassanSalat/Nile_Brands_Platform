@@ -1,0 +1,107 @@
+<div class="container min-h-screen mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center mt-8">
+  <!-- Product Images Section -->
+  <div class="flex flex-col items-center">
+    <div class="">
+      <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor mr-64">Details</h2>
+    </div>
+
+    <div class="relative max-w-[350px] h-[450px] flex items-center justify-center border rounded-lg shadow-md p-4 mt-2">
+      <img [src]="selectedImage" class="w-full h-full object-cover" alt="Product Image">
+      <div
+        class="absolute inset-0 top-5 left-[19rem] max-sm:left-[17rem] text-lg transition duration-300 cursor-pointer">
+        <svg class="w-6 h-6 transition-all duration-300" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path class="stroke-fontColor fill-transparent hover:fill-primary transition-all duration-300"
+            stroke-width="1" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81
+                  4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Thumbnails -->
+    <div class="flex gap-3 mt-4">
+      <img *ngFor="let image of productImages; let i = index" [src]="image"
+        class="w-16 h-16 cursor-pointer border rounded-md p-1" [class.border-primary]="selectedImage === image"
+        (click)="selectedImage = image">
+    </div>
+  </div>
+
+  <!-- Product Details Section -->
+  <div class="flex flex-col gap-4 max-sm:ml-5">
+
+    <h2 class="text-[25px] sm:text-[30px] font-[500] text-fontColor">{{ product.title }}</h2>
+    <p class="text-[20px] sm:text-[25px] font-[500] text-fontColor">{{ product.description }}</p>
+
+    <!-- Ratings -->
+    <div class="flex flex-col gap-1">
+      <p class="text-[25px] sm:text-[30px] font-[500] text-fontColor">Reviews</p>
+      <div class="grid grid-cols-5 max-w-[40%] max-lg:max-w-[60%]">
+        <svg *ngFor="let star of stars; let i = index" [attr.fill]="(i + 1) <=  rating ? '#F5E426' : '#D9D9D9'"
+          width="35" height="32" viewBox="0 0 35 32" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M17.5 0L21.429 12.0922L34.1435 12.0922L23.8572 19.5656L27.7862 31.6578L17.5 24.1844L7.21376 31.6578L11.1428 19.5656L0.85651 12.0922L13.571 12.0922L17.5 0Z" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Size Selection -->
+    <div>
+      <p class="text-[25px] sm:text-[30px] font-[500] text-fontColor">Size</p>
+      <div class="flex gap-3 mt-2">
+        <button *ngFor="let size of product.sizes" (click)="selectedSize = size"
+          [class.bg-primary]="selectedSize === size" [class.text-white]="selectedSize === size"
+          class="px-4 py-2 border rounded-md hover:bg-primary hover:text-white">
+          {{ size }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Price -->
+    <p class="text-[25px] sm:text-[30px] font-[500] text-fontColor">Price: {{ product.price }} le</p>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col gap-4">
+      <button class="w-[50%] px-6 py-1 text-[16px] md:text-[20px] text-white bg-primary rounded-xl">Add to Cart</button>
+      <button
+        class="w-[50%] px-6 py-1 text-[16px] md:text-[20px] text-primary bg-white rounded-xl border-2 border-primary">Buy
+        Now</button>
+    </div>
+  </div>
+
+</div>
+
+<hr class="my-10">
+
+<div class="max-w-[1000px] mx-auto">
+  <!-- Comments Section -->
+  <div class="flex flex-col gap-4">
+    <div>
+      <input placeholder="Add Your Comment"
+        class="relative w-full px-4 py-2 text-[#03355582] border-none bg-[#D9D9D9] rounded-[19px]">
+    </div>
+    <div class="relative w-full h-full text-[#03355582] bg-[#D9D9D9] rounded-[19px] px-4 py-2">
+      <div class="absolute inset-0 top-3 left-4 w-[40px] h-[40px]">
+        <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
+      </div>
+      <p class="ml-16">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eos nihil nulla reprehenderit officiis
+        illum recusandae
+        suscipit voluptate cupiditate et quidem assumenda, hic doloremque aliquid, molestias fugiat excepturi nobis
+        fugit
+        itaque.
+      </p>
+    </div>
+    <div class="relative w-full h-full text-[#03355582] bg-[#D9D9D9] rounded-[19px] px-4 py-2">
+      <div class="absolute inset-0 top-3 left-4 w-[40px] h-[40px]">
+        <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
+      </div>
+      <p class="ml-16">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eos nihil nulla reprehenderit officiis
+        illum recusandae
+        suscipit voluptate cupiditate et quidem assumenda, hic doloremque aliquid, molestias fugiat excepturi nobis
+        fugit
+        itaque.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<hr class="my-10">
