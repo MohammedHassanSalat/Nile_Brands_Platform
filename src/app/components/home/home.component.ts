@@ -11,7 +11,7 @@ import { WishlistService } from '../wishlist/wishlist.service';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
-  home_page: string = 'images/images ui/home.jpg';
+  home_page: string = 'images/images ui/home.png';
   products: any[] = [];
   filteredProducts: any[] = [];
   apiUrl = 'https://fakestoreapi.com/products';
