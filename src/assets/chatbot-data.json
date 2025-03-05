@@ -1,0 +1,65 @@
+{
+  "faqs": [
+    {
+      "category": "General",
+      "questions": [
+        { "question": "What is Nile Brands?", "answer": "Nile Brands is an online marketplace that connects Egyptian brands with customers." },
+        { "question": "Who can use Nile Brands?", "answer": "Both customers and brand owners can use the platform to buy and sell products." },
+        { "question": "How do I create an account?", "answer": "Click on 'Sign Up', enter your details, and verify your email." },
+        { "question": "Is there a mobile app for Nile Brands?", "answer": "Yes, you can download our app from the App Store or Google Play." },
+        { "question": "Is Nile Brands free to use?", "answer": "Yes, customers can browse and purchase for free. Brand owners may have subscription plans for premium features." },
+        { "question": "Can I delete my account?", "answer": "Yes, go to account settings and select 'Delete Account'. This action is irreversible." }
+      ]
+    },
+    {
+      "category": "Orders",
+      "questions": [
+        { "question": "How do I place an order?", "answer": "Add items to your cart and proceed to checkout." },
+        { "question": "Can I cancel my order?", "answer": "Yes, you can cancel your order before it is shipped from the 'My Orders' section." },
+        { "question": "What happens if my order is delayed?", "answer": "You will receive a notification if your order is delayed. Contact support for assistance." },
+        { "question": "Can I modify my order after placing it?", "answer": "Once an order is placed, modifications are not allowed. You may cancel and reorder." },
+        { "question": "Do I need an account to place an order?", "answer": "Yes, an account is required to track your order and manage payments securely." }
+      ]
+    },
+    {
+      "category": "Payments",
+      "questions": [
+        { "question": "What payment methods are available?", "answer": "We accept credit/debit cards and PayPal." },
+        { "question": "Is my payment information secure?", "answer": "Yes, we use encrypted transactions for security." },
+        { "question": "Can I get a refund?", "answer": "Refunds are available for eligible orders based on our refund policy." },
+        { "question": "Do you offer cash on delivery?", "answer": "Currently, we do not support cash on delivery." },
+        { "question": "Are there any hidden fees?", "answer": "No, all applicable fees are displayed at checkout before payment." }
+      ]
+    },
+    {
+      "category": "Product Management",
+      "questions": [
+        { "question": "How do I add a new product?", "answer": "Go to your dashboard, click 'Add Product', and enter the required details." },
+        { "question": "Can I edit my product details?", "answer": "Yes, you can edit your product details from your dashboard at any time." },
+        { "question": "How do I delete a product listing?", "answer": "Go to your product list and select 'Delete' for the product you want to remove." },
+        { "question": "Can I offer discounts on my products?", "answer": "Yes, you can set discounts from your dashboard under 'Promotions'." },
+        { "question": "How many products can I list?", "answer": "There is no limit for standard users. Premium members get additional promotional tools." }
+      ]
+    },
+    {
+      "category": "Shipping & Delivery",
+      "questions": [
+        { "question": "How long does delivery take?", "answer": "Delivery times vary depending on your location but typically take 3-7 business days." },
+        { "question": "Can I track my order?", "answer": "Yes, go to 'My Orders' and check the status of your shipment." },
+        { "question": "What happens if my package is lost?", "answer": "If your package is lost, contact our support team for assistance." },
+        { "question": "Do you ship internationally?", "answer": "Yes, we offer international shipping for select products." },
+        { "question": "Can I change my shipping address after ordering?", "answer": "If your order has not shipped yet, you can update your address in 'My Orders'." }
+      ]
+    },
+    {
+      "category": "Support",
+      "questions": [
+        { "question": "How do I contact customer support?", "answer": "You can reach our support team via the 'Help Center' on our website." },
+        { "question": "Is there a chatbot available?", "answer": "Yes, our chatbot can assist you with frequently asked questions and support requests." },
+        { "question": "How do I report a problem with my order?", "answer": "Go to 'My Orders', select the order, and click 'Report Issue'." },
+        { "question": "Can I request a callback from support?", "answer": "Yes, you can request a callback through the 'Help Center'." },
+        { "question": "What are support hours?", "answer": "Our support team is available 24/7 to assist you." }
+      ]
+    }
+  ]
+}

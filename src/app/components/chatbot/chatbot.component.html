@@ -1,88 +1,127 @@
-<!-- Chatbot Toggle Button -->
-<button (click)="toggleChatbot()" class="fixed bottom-4 right-8 rounded-full flex items-center justify-center">
-<img [src]="chatbot_logo" alt="Chat" class="w-[50%] h-[50%] animate-bounce">
+<!-- Chatbot Toggle Button -->   
+<button (click)="toggleChatbot()" 
+  class="fixed bottom-4 right-4 md:right-8 rounded-full flex items-center justify-center">
+  <img [src]="chatbot_logo" alt="Chat" class="w-[50%] h-[50%] animate-bounce">
 </button>
 
 <!-- Chatbot Container -->
-<div *ngIf="isChatbotOpen" class="w-[400px] h-[550px] fixed z-50 bottom-20 right-8 bg-white shadow-lg rounded-lg border border-gray-300 flex flex-col">
+<div *ngIf="isChatbotOpen"
+  class="w-full max-w-[90%] md:max-w-[400px] h-[530px] fixed z-50 bottom-20 right-4 md:right-8 bg-white shadow-lg rounded-lg border border-gray-300 flex flex-col">
+  
+  <!-- Header -->
+  <div class="p-1 border-b bg-white rounded-t-lg flex items-center justify-between relative">
+    <div class="flex items-center">
+      <!-- Back Button -->
+      <button (click)="toggleChatbot()" class="p-2 hover:bg-gray-200 rounded-full">
+        <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.57 6.43L3.5 12.5L9.57 18.57" stroke="#292D32" stroke-width="1.5"/>
+          <path d="M20.5 12.5H3.67" stroke="#292D32" stroke-width="1.5"/>
+        </svg>
+      </button>
+      <!-- Chatbot Info -->
+      <div class="ml-4 flex items-center">
+        <img [src]="chatbot_icon" alt="Chat" class="w-[20%] md:w-[25%] h-[20%] md:h-[35%]">
+        <div class="ml-5">
+          <h2 class="text-lg font-bold text-[#3369FF]">Chatbot</h2>
+          <span class="text-[#3ABF38] font-medium flex items-center">
+            ● <span class="ml-1 text-sm">Online</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <!-- Suggestion Toggle Icon (Lamp Icon) -->
+    <div class="relative">
+      <button (click)="toggleMenu()" 
+        class="p-2 hover:bg-gray-200 rounded-full focus:outline-none transform transition-transform duration-300"
+        [ngClass]="{'rotate-180': isMenuOpen}">
+        <img src="https://cdn-icons-png.flaticon.com/512/5203/5203555.png" 
+             alt="Suggestions" 
+             class="w-12 h-12 md:w-14 md:h-14">
+      </button>
+      <!-- Suggestion Popover (Side Square) -->
+      <!-- ADDED max-h-[350px] overflow-y-auto -->
+      <div *ngIf="isMenuOpen" 
+        class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-20 transition-all duration-300 ease-out
+               max-h-[395px] overflow-y-auto">
+        <div class="p-3">
+          <h3 class="text-center font-bold text-gray-700 mb-2">Suggested Questions</h3>
+          <p class="text-xs text-center text-gray-500 mb-3">Tap a suggestion to ask your question</p>
+          <!-- If no category is selected, display categories -->
+          <ng-container *ngIf="!selectedCategory">
+            <div class="grid grid-cols-1 gap-2">
+              <button
+                *ngFor="let c of chatbotData?.faqs"
+                (click)="selectCategory(c.category)"
+                class="w-full border border-[#3369FF] text-gray-800 px-3 py-2 rounded-md hover:bg-gray-200 transition-transform transform hover:scale-105"
+              >
+                {{ c.category }}
+              </button>
+            </div>
+          </ng-container>
+          <!-- If a category is selected, display its questions -->
+          <ng-container *ngIf="selectedCategory">
+            <button
+              (click)="deselectCategory()"
+              class="w-full border border-[#3369FF] bg-blue-50 text-blue-700 px-3 py-2 rounded-md hover:bg-blue-100 transition-transform transform hover:scale-105 mb-2"
+            >
+              Back to Categories
+            </button>
+            <div class="grid grid-cols-1 gap-2">
+              <button
+                *ngFor="let q of selectedCategoryQuestions"
+                (click)="selectSuggestedQuestion(q.question)"
+                class="w-full border border-[#3369FF] text-gray-800 px-3 py-0.5 rounded-md hover:bg-gray-200 transition-transform transform hover:scale-105"
+              >
+                {{ q.question }}
+              </button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chat Messages -->
+  <div class="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4">
+    <div *ngFor="let message of messages" 
+      class="flex" [ngClass]="{'justify-end': message.isUser, 'justify-start': !message.isUser}">
+      <!-- User Message -->
+      <div class="bg-[#3369FF] text-white p-3 rounded-2xl max-w-[80%] md:max-w-xs" 
+           *ngIf="message.isUser">
+        {{ message.text }}
+      </div>
+      <!-- Bot Message -->
+      <div class="flex items-end" *ngIf="!message.isUser">
+        <img [src]="chatbot_icon" alt="Bot" class="w-6 h-6 mr-2 animate-bounce">
+        <div class="bg-[#EEEEEE] text-[#505050] p-3 rounded-2xl max-w-[80%] md:max-w-xs">
+          <div *ngIf="message.text">{{ message.text }}</div>
+          <div *ngIf="message.button">
+            <a [href]="message.button.url" target="_blank"
+              class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg inline-block">
+              {{ message.button.text }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!-- Header -->
-<div class="flex items-center p-4 border-b bg-white">
-
-<!-- Back Button -->
-<button (click)="toggleChatbot()" class="p-2 hover:bg-gray-200 rounded-full">
-<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M9.57 6.43L3.5 12.5L9.57 18.57" stroke="#292D32" stroke-width="1.5"/>
-<path d="M20.5 12.5H3.67" stroke="#292D32" stroke-width="1.5"/>
-</svg>
-</button>
-
-<!-- Chatbot Info -->
-<div class="ml-4 flex items-center">
-<img [src]="chatbot_icon" alt="Chat" class="w-[25%] h-[25%] animate-spin">
-<div class="ml-5">
-<h2 class="text-lg font-bold text-[#3369FF]">Chatbot</h2>
-<span class="text-[#3ABF38] font-medium flex items-center">
-● <span class="ml-1 text-sm">Online</span>
-</span>
-</div>
-</div>
-
-<div class="ml-auto flex items-center space-x-2">
-
-<!-- Speaker Icon -->
-<button class="p-2 hover:bg-gray-200 rounded-full">
-<svg width="24" height="24" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M2 10.5V14.5C2 16.5 3 17.5 5 17.5H6.43C6.8 17.5 7.17 17.61 7.49 17.8L10.41 19.63C12.93 21.21 15 20.06 15 17.09V7.91C15 4.93 12.93 3.79 10.41 5.37L7.49 7.2C7.17 7.39 6.8 7.5 6.43 7.5H5C3 7.5 2 8.5 2 10.5Z" stroke="#292D32" stroke-width="1.5" />
-<path d="M18 8.5C19.78 10.87 19.78 14.13 18 16.5" stroke="#292D32" stroke-width="1.5" />
-<path d="M19.83 6C22.72 9.85 22.72 15.15 19.83 19" stroke="#292D32" stroke-width="1.5" />
-</svg>
-</button>
-
-<!-- Refresh Icon -->
-<button class="p-2 hover:bg-gray-200 rounded-full">
-<svg width="24" height="24" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M9.32 7L11.88 4.44L14.44 7" stroke="#CACACA" stroke-width="1.5" />
-<path d="M11.88 14.68V4.51" stroke="#CACACA" stroke-width="1.5" />
-<path d="M4 12.5C4 16.92 7 20.5 12 20.5C17 20.5 20 16.92 20 12.5" stroke="#CACACA" stroke-width="1.5" />
-</svg>
-</button>
-</div>
-</div>
-
-<!-- Chat Messages -->
-<div class="flex-1 overflow-y-auto p-4 space-y-4">
-<div *ngFor="let message of messages" class="flex" [ngClass]="{'justify-end': message.isUser, 'justify-start': !message.isUser}">
-<div class="bg-[#3369FF] text-white p-3 rounded-lg max-w-xs" *ngIf="message.isUser">{{ message.text }}</div>
-<div class="flex items-end" *ngIf="!message.isUser">
-<img [src]="chatbot_icon" alt="Bot" class="w-6 h-6 mr-2 animate-bounce">
-<div class="bg-[#EEEEEE] text-[#505050] p-3 rounded-lg max-w-xs">{{ message.text }}</div>
-</div>
-</div>
-</div>
-
-<!-- Menu Bar -->
-<div class="p-4 border-t bg-gray-100">
-<button (click)="toggleMenu()" class="w-full text-left font-bold text-gray-700 flex justify-between items-center">
-Suggested Questions
-<span [ngClass]="{'rotate-180': isMenuOpen}">▼</span>
-</button>
-<div *ngIf="isMenuOpen" class="mt-2 space-y-2">
-<button *ngFor="let q of defaultQuestions" (click)="selectSuggestedQuestion(q.question)"
-class="block w-full border border-[#3369FF] text-gray-800 px-3 py-1 text-sm rounded-lg hover:bg-gray-200 transition">
-{{ q.question }}
-</button>
-</div>
-</div>
-
-<!-- Input Field -->
- <div class="flex items-center bg-white px-4 py-2 border-t">
-<input type="text" [(ngModel)]="inputMessage" class="flex-1 border border-[#3369FF] rounded-lg px-3 py-1 text-[#3369FF]"
-placeholder="Hello ,how are you today?" (keydown.enter)="sendMessage()"/>
-<button class="ml-2" (click)="sendMessage()">
-<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M18.07 8.50965L9.51002 4.22965C3.76002 1.34965 1.40002 3.70965 4.28002 9.45965L5.15002 11.1996C5.40002 11.7096 5.40002 12.2996 5.15002 12.8096L4.28002 14.5396C1.40002 20.2896 3.75002 22.6496 9.51002 19.7696L18.07 15.4896C21.91 13.5696 21.91 10.4296 18.07 8.50965Z" fill="#3369FF"/>
-</svg>
-</button>
-</div>
+  <!-- Input Field -->
+  <div class="flex items-center bg-white px-3 py-3 rounded-2xl">
+    <input
+      type="text"
+      [(ngModel)]="inputMessage"
+      class="flex-1 bg-white shadow-md rounded-full border border-gray-200 px-3 py-3 text-[#3369FF]"
+      placeholder="Ask me anything..."
+      (keydown.enter)="sendMessage()"
+    />
+    <button class="ml-2" (click)="sendMessage()">
+      <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M18.07 8.50965L9.51002 4.22965C3.76002 1.34965 1.40002 3.70965 4.28002 9.45965L5.15002 11.1996C5.40002 11.7096 5.40002 12.2996 5.15002 12.8096L4.28002 14.5396C1.40002 20.2896 3.75002 22.6496 9.51002 19.7696L18.07 15.4896C21.91 13.5696 21.91 10.4296 18.07 8.50965Z"
+          fill="#3369FF"
+        />
+      </svg>
+    </button>
+  </div>
 </div>
