@@ -11,6 +11,7 @@ import { EditprofileComponent } from './components/editprofile/editprofile.compo
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { TrackorderComponent } from './components/trackorder/trackorder.component';
 import { ProductdetailsComponent } from './components/productdetails/productdetails.component';
+import { CreatebrandComponent } from './components/brandDashboard/createbrand/createbrand.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -26,5 +27,6 @@ export const routes: Routes = [
   { path: 'feedback', component: FeedbackComponent },
   { path: 'trackorder', component: TrackorderComponent },
   { path: 'productdetails', component: ProductdetailsComponent },
+  { path: 'createbrand', component: CreatebrandComponent },
 ];
 

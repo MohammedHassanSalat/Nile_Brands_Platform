@@ -8,7 +8,7 @@
     <!-- Left Section (Timeline) -->
     <div class="flex flex-col items-center relative w-[80px] mt-5">
       <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center">
-        <div class="w-10 h-10 flex items-center justify-center text-[30px] text-primary font-[700] bg-[#b5b5b5] rounded-full border-2 border-primary" [class.bg-primary]="i < currentStep"
+        <div class="w-10 h-10 flex items-center justify-center text-[30px] text-primary font-[700] bg-[#b5b5b5] rounded-full border-2 border-primary"
           [class.border-primary]="i < currentStep" [class.text-secondary]="i >= currentStep">
           {{ i + 1 }}
         </div>

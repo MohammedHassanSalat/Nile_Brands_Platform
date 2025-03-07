@@ -21,6 +21,7 @@ export class NavbarComponent {
     '/forgetpassword',
     '/register',
     '/verifyemail',
+    '/createbrand',
   ];
 
   constructor(private router: Router) {

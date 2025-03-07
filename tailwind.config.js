@@ -4,10 +4,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'primary': "#033555",
-        'secondary': "#828282",
-        'thrid': "#70CEAF",
-        'fontColor': "#242526",
+        primary: "#033555",
+        secondary: "#828282",
+        thrid: "#70CEAF",
+        fontColor: "#242526",
+        placeholder: "#0000009C",
       },
       animation: {
         "fade-in": "fadeIn 1s ease-out forwards",
