@@ -14,6 +14,7 @@
   aria-label="Sidenav">
   <div class="overflow-y-auto py-5 px-3 h-full bg-white border-r border-fontColor">
     <ul class="space-y-2">
+      <!-- logo -->
       <li>
         <a routerLink="/dashboard">
           <img src="images/images ui/nile brand.png" alt="Logo" class="w-24 h-24" />
@@ -61,7 +62,7 @@
             </a>
           </li>
           <li class="ml-4">
-            <a href="#"
+            <a [routerLink]="['/dashboard/updatebrand']" routerLinkActive="router-link-active"
               class="flex items-center p-2 text-base font-normal text-fontColor rounded-lg transition duration-75 hover:bg-gray-100">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_898_2272)">

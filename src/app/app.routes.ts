@@ -16,6 +16,7 @@ import { OwnerDashboardComponent } from './components/brandDashboard/owner-dashb
 import { HeroComponent } from './components/brandDashboard/hero/hero.component';
 import { AddproductComponent } from './components/brandDashboard/addproduct/addproduct.component';
 import { ProfileComponent } from './components/brandDashboard/profile/profile.component';
+import { UpdatebrandComponent } from './components/brandDashboard/updatebrand/updatebrand.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -37,6 +38,7 @@ export const routes: Routes = [
         { path:'hero', component: HeroComponent },
         { path:'addproduct', component: AddproductComponent },
         { path:'profile', component: ProfileComponent },
+        { path:'updatebrand', component: UpdatebrandComponent },
       ]
   },
 ];
