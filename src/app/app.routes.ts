@@ -12,6 +12,7 @@ import { FeedbackComponent } from './components/feedback/feedback.component';
 import { TrackorderComponent } from './components/trackorder/trackorder.component';
 import { ProductdetailsComponent } from './components/productdetails/productdetails.component';
 import { CreatebrandComponent } from './components/brandDashboard/createbrand/createbrand.component';
+import { OwnerDashboardComponent } from './components/brandDashboard/owner-dashboard/owner-dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -28,5 +29,10 @@ export const routes: Routes = [
   { path: 'trackorder', component: TrackorderComponent },
   { path: 'productdetails', component: ProductdetailsComponent },
   { path: 'createbrand', component: CreatebrandComponent },
+  { path: 'dashboard', component: OwnerDashboardComponent,
+      children: [
+        { path:'main', component: CreatebrandComponent }
+      ]
+  },
 ];
 

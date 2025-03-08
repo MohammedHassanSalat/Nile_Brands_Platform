@@ -22,6 +22,7 @@ export class NavbarComponent {
     '/register',
     '/verifyemail',
     '/createbrand',
+    '/dashboard',
   ];
 
   constructor(private router: Router) {
