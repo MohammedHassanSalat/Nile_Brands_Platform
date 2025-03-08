@@ -25,6 +25,7 @@ export class NavbarComponent {
     '/dashboard',
     '/dashboard/hero',
     '/dashboard/addproduct',
+    '/dashboard/profile',
   ];
 
   constructor(private router: Router) {
