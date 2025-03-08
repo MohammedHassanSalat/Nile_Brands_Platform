@@ -13,6 +13,7 @@ import { TrackorderComponent } from './components/trackorder/trackorder.componen
 import { ProductdetailsComponent } from './components/productdetails/productdetails.component';
 import { CreatebrandComponent } from './components/brandDashboard/createbrand/createbrand.component';
 import { OwnerDashboardComponent } from './components/brandDashboard/owner-dashboard/owner-dashboard.component';
+import { HeroComponent } from './components/brandDashboard/hero/hero.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -31,7 +32,7 @@ export const routes: Routes = [
   { path: 'createbrand', component: CreatebrandComponent },
   { path: 'dashboard', component: OwnerDashboardComponent,
       children: [
-        { path:'main', component: CreatebrandComponent }
+        { path:'hero', component: HeroComponent }
       ]
   },
 ];

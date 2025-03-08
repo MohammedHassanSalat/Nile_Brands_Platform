@@ -1,10 +1,10 @@
 <div class="min-h-screen">
   <div class="grid grid-cols-8">
-    <div class="col-span-2">
+    <div class="col-span-1 sm:col-span-2">
       <app-sidebar></app-sidebar>
     </div>
-    <div class="mt-4 col-span-6 items-center justify-center sm:ml-24">
-      <div class="flex items-center gap-12">
+    <div class="mt-4 col-span-8 sm:col-span-6 items-center justify-center">
+      <div class="flex items-center gap-12 sm:ml-28">
         <div class="w-[70%]">
           <form class="relative w-full">
             <div class="absolute inset-y-0 left-2 flex items-center text-fontColor dark:text-white">
@@ -22,7 +22,9 @@
           <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
         </div>
       </div>
-      <router-outlet></router-outlet>
+      <div class="ml">
+        <router-outlet></router-outlet>
+      </div>
     </div>
   </div>
 </div>
