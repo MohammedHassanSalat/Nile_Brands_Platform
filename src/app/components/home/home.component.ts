@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { WishlistService } from '../../services/wishlist/wishlist.service';
+import { CartService } from '../../services/cart/cart.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
   home_page: string = 'images/images ui/home.png';
@@ -18,7 +20,12 @@ export class HomeComponent implements OnInit {
   selectedCategory: string = 'All';
   visibleProductsCount = 10;
 
-  constructor(private http: HttpClient, public wishlistService: WishlistService) {}
+  constructor(
+    private http: HttpClient,
+    public wishlistService: WishlistService,
+    private cartService: CartService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.fetchProducts();
@@ -49,5 +56,17 @@ export class HomeComponent implements OnInit {
 
   seeMore() {
     this.visibleProductsCount += 10;
+  }
+
+  onAddToCart(product: any) {
+    const cartItem = {
+      name: product.title,
+      description: product.description,
+      image: product.image,
+      price: product.price,
+      quantity: 1
+    };
+    this.cartService.addItem(cartItem);
+    this.router.navigate(['/cart']);
   }
 }

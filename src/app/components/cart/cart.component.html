@@ -1,1 +1,186 @@
-<!-- coming soon... -->
+<div class="bg-white min-h-screen">
+  <div class="container mx-auto py-24 px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div>
+        <div class="flex items-center justify-between w-full mb-6">
+          <h1 class="text-3xl font-bold" style="color: #242526;">Your Cart</h1>
+          <button 
+            class="px-2 py-1 rounded transition border ml-auto"
+            style="border-color: #033555; background-color: #033555; color: white; transform: translateX(250px);"
+            (click)="removeAll()"
+          >
+            Remove All
+          </button>
+        </div>
+
+
+        <div class="grid grid-cols-3 gap-x-72 gap-y-6">
+          <div 
+            *ngFor="let item of cartItems; let i = index"
+            class="relative flex flex-col bg-white p-3 shadow-md rounded-lg w-[300px] h-[150px] border"
+            style="border-color: #828282;">
+            <div class="flex items-center mb-2 mr-5">
+              <img 
+                [src]="item.image" 
+                [alt]="item.name" 
+                class="w-50 h-20 object-cover rounded mr-2"
+              />
+              <div>
+                <h3 class="text-sm font-semibold" style="color: #242526;">
+                  {{ item.name | slice:0:25 }}...
+                </h3>
+                <p class="text-xs" style="color: #828282;">
+                  {{ item.description | slice:0:15 }}...
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-auto">
+              <p class="font-bold text-sm" style="color: #033555;">
+                {{ item.price }} LE
+              </p>
+              
+
+              <div class="flex items-center space-x-2">
+                <button 
+                  class="border rounded text-xs px-1 py-1"
+                  style="border-color: #828282; color: #242526;"
+                  (click)="decrementQuantity(item)">
+                  -
+                </button>
+                <input
+                  type="number"
+                  class="appearance-none w-16 text-center border rounded focus:outline-none text-xs"
+                  style="border-color: #828282; color: #242526; -moz-appearance: textfield; -webkit-appearance: none; appearance: none;"
+                  [(ngModel)]="item.quantity"/>
+
+                <button 
+                  class="border rounded text-xs px-1 py-1"
+                  style="border-color: #828282; color: #242526;"
+                  (click)="incrementQuantity(item)">
+                  +
+                </button>
+              </div>
+  
+
+              <button 
+                class="px-2 py-1 rounded transition text-xs"
+                style="background-color:#033555; color: #fff;"
+                (click)="removeItem(i)">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex justify-end">
+        <div class="max-w-md m-10 mr-0.5">
+          <div
+            class="mb-6 w-full  sm:mt-8 lg:mt-6 lg:max-w-xs xl:max-w-md">
+          <div class="mb-6 w-full " >
+            
+
+            <div class="mb-3">
+              <label class="block text-sm font-medium mb-1" style="color: #737373;">Email</label>
+              <input 
+                type="email"
+                class="w-full border px-3 py-2 rounded focus:outline-none text-sm bg-white shadow-md"
+                style="border-color: #E5E5E5; color:#737373;"
+                placeholder="example@gmail.com"
+                required
+              />
+            </div>
+ 
+            <div class="mb-3">
+              <label class="block text-sm font-medium mb-1" style="color: #737373;">Card information</label>
+              <div class="flex items-center border rounded bg-white shadow-md" style="border-color: #E5E5E5;">
+                <input
+                  type="text"
+                  pattern="[0-9\s]*"
+                  inputmode="numeric"
+                  class="flex-1 bg-transparent focus:outline-none text-sm border-white"
+                  style="color: #737373;"
+                  placeholder="1234 1234 1234 1234"
+                  required
+                />
+
+                <img [src]="pay_1" alt="Visa" class="h-5 ml-1" />
+                <img [src]="pay_2" alt="MasterCard" class="h-5 ml-2" />
+                <img [src]="pay_3" alt="Discover" class="h-5 ml-2" />
+                <img [src]="pay_4" alt="Discover" class="h-5 ml-2" />
+              </div>
+              <div class="">
+
+                <input 
+                  type="text"
+                  pattern="[0-9/]*"
+                  inputmode="numeric"
+                  class="w-1/2 border px-3 py-2 rounded focus:outline-none text-sm bg-white shadow-md"
+                  style="border-color: #E5E5E5; color: #737373;"
+                  placeholder="MM/YY"
+                  required/>
+
+                <input 
+                  type="text"
+                  pattern="[0-9]*"
+                  inputmode="numeric"
+                  class="w-1/2 border px-3 py-2 rounded focus:outline-none text-sm bg-white shadow-md"
+                  style="border-color: #E5E5E5; color: #737373;"
+                  placeholder="CVC"
+                  required/>
+              </div>
+            </div>
+  
+            <div class="mb-3">
+              <label class="block text-sm font-medium mb-1" style="color: #737373;">Cardholder name</label>
+              <input 
+                type="text"
+                pattern="[A-Za-z\s]*"
+                class="w-full border px-3 py-2 rounded focus:outline-none text-sm bg-white shadow-md"
+                style="border-color: #E5E5E5; color: #737373;"
+                placeholder="Full name on card"
+                required
+              />
+            </div>
+  
+            <div class="">
+              <label class="block text-sm font-medium mb-1" style="color: #737373;">Country or region</label>
+              <select 
+                class="w-full border px-3 py-2 rounded focus:outline-none text-sm bg-white shadow-md" 
+                style="border-color: #E5E5E5; color: #737373;">
+                <option>United States</option>
+                <option>Canada</option>
+                <option>Eygpt</option>
+              </select>
+            </div>
+            <div class="mb-5">
+              <input 
+                type="text"
+                pattern="[0-9]*"
+                inputmode="numeric"
+                class="w-full border px-3 py-2 rounded focus:outline-none text-sm bg-white shadow-md"
+                style="border-color: #E5E5E5; color: #737373;"
+                placeholder="ZIP"
+                required/>
+            </div>
+  
+ 
+            <button 
+              type="button"
+              class="w-full py-2 rounded transition text-white text-sm"
+              style="background-color: #033555;"
+              (click)="onCheckout()"
+            >
+              Pay {{ getTotal() | number:'1.2-2' }} LE
+            </button>
+            <p class="text-xs mt-2 ml-5" style="color: #828282;">
+              By clicking Pay, you agree to the Link Terms and Privacy Policy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>

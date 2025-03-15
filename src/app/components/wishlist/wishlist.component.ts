@@ -1,19 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WishlistService } from '../../services/wishlist/wishlist.service';
+import { CartService } from '../../services/cart/cart.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-wishlist',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './wishlist.component.html',
-  styleUrl: './wishlist.component.css'
+  styleUrls: ['./wishlist.component.css']
 })
 export class WishlistComponent implements OnInit {
   empty_wishlist: string = 'images/images ui/empty wishlist.svg';
   wishlist: any[] = [];
 
-  constructor(public wishlistService: WishlistService) {}
+  constructor(
+    public wishlistService: WishlistService,
+    private cartService: CartService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadWishlist();
@@ -26,5 +32,17 @@ export class WishlistComponent implements OnInit {
   removeFromWishlist(productId: number) {
     this.wishlistService.removeFromWishlist(productId);
     this.loadWishlist(); 
+  }
+
+  onAddToCart(product: any) {
+    const cartItem = {
+      name: product.title,
+      description: product.description,
+      image: product.image,
+      price: product.price,
+      quantity: 1
+    };
+    this.cartService.addItem(cartItem);
+    this.router.navigate(['/cart']);
   }
 }

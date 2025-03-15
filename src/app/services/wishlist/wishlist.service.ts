@@ -7,13 +7,13 @@ export class WishlistService {
   private wishlist: any[] = [];
 
   constructor() {
-    this.loadWishlistFromStorage(); 
+    this.loadWishlistFromStorage();
   }
 
   private loadWishlistFromStorage() {
-    const storedWishlist = localStorage.getItem('wishlist');
-    if (storedWishlist) {
-      this.wishlist = JSON.parse(storedWishlist);
+    const stored = localStorage.getItem('wishlist');
+    if (stored) {
+      this.wishlist = JSON.parse(stored);
     }
   }
 
@@ -28,7 +28,7 @@ export class WishlistService {
   addToWishlist(product: any) {
     if (!this.isInWishlist(product.id)) {
       this.wishlist.push(product);
-      this.saveWishlistToStorage(); 
+      this.saveWishlistToStorage();
     }
   }
 

@@ -33,13 +33,14 @@ export const routes: Routes = [
   { path: 'trackorder', component: TrackorderComponent },
   { path: 'productdetails', component: ProductdetailsComponent },
   { path: 'createbrand', component: CreatebrandComponent },
-  { path: 'dashboard', component: OwnerDashboardComponent,
-      children: [
-        { path:'hero', component: HeroComponent },
-        { path:'addproduct', component: AddproductComponent },
-        { path:'profile', component: ProfileComponent },
-        { path:'updatebrand', component: UpdatebrandComponent },
-      ]
-  },
+  {
+    path: 'dashboard',
+    component: OwnerDashboardComponent,
+    children: [
+      { path: 'hero', component: HeroComponent },
+      { path: 'addproduct', component: AddproductComponent },
+      { path: 'profile', component: ProfileComponent },
+      { path: 'updatebrand', component: UpdatebrandComponent }
+    ]
+  }
 ];
-
