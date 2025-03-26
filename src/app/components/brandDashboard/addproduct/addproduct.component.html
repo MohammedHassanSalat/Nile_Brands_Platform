@@ -4,71 +4,125 @@
   </div>
 
   <div class="p-6 bg-white shadow-md border rounded-lg border-fontColor">
-    <div class="mt-6">
-      <div class="w-[100px] h-[100px]">
-        <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
+    <div class="mt-3 ml-24">
+      <div class="relative w-[45%] h-[40px] bg-gray-200 flex items-center justify-center">
+        <img *ngIf="previewUrl" [src]="previewUrl" alt="Product Image" class="w-full h-full object-cover"/>
+        <div *ngIf="!previewUrl" class="text-gray-600 text-sm">
+          Img
+        </div>
+
+    <!-- icons-->
+    <button type="button" (click)="fileInput.click()" 
+      class="absolute right-0 bottom-0 transform translate-x-1/2 translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center" aria-label="Upload Image">
+      <svg class="h-4 w-4 text-black" viewBox="0 0 24 24" fill="none"> 
+        <path d="M14.958 11.5001H12.5V9.03406C12.5 8.75806 12.276 8.53406 12 8.53406C11.724 8.53406 11.5 8.75806 11.5 9.03406V11.5001H9.04199C8.76599 11.5001 8.54199 11.7241 8.54199 12.0001C8.54199 12.2761 8.76599 12.5001 9.04199 12.5001H11.5V14.9661C11.5 15.2421 11.724 15.4661 12 15.4661C12.276 15.4661 12.5 15.2421 12.5 14.9661V12.5001H14.958C15.234 12.5001 15.458 12.2761 15.458 12.0001C15.458 11.7241 15.234 11.5001 14.958 11.5001Z" fill="currentColor" /> 
+        <path d="M11.9969 1C4.94688 1.044 1.02588 5.202 1.02588 11.991C1.02588 18.957 4.84888 22.958 12.0029 23C19.1499 22.958 22.8419 19.26 22.9739 11.991C22.8519 4.949 18.9559 1.045 11.9969 1ZM12.0029 22C5.41488 21.961 2.15088 18.69 2.02588 12C2.14588 5.405 5.50288 2.041 11.9959 2C16.4689 2.029 21.8309 3.79 21.9729 11.991C21.8509 18.687 18.5879 21.961 12.0019 22H12.0029Z" fill="currentColor" />
+      </svg> 
+    </button>
+
+
+        <!-- Hidden file input for image selection -->
+        <input
+          type="file"
+          #fileInput
+          class="hidden"
+          accept="image/*"
+          (change)="onFileSelected($event)"/>
       </div>
     </div>
 
+    <!-- Product Form -->
     <form class="mt-6">
       <div class="relative">
-        <label for="name"
+        <label
+          for="name"
           class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Name</label>
-        <input type="text" id="name"
-          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <input
+          type="text"
+          id="name"
+          name="name"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor"/>
       </div>
 
       <div class="relative mt-4">
-        <label for="description"
+        <label
+          for="description"
           class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Description</label>
-        <input type="text" id="description"
-          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <input
+          type="text"
+          id="description"
+          name="description"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor"/>
       </div>
 
       <div class="relative mt-4">
-        <label for="sizes"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">sizes</label>
-        <input type="text" id="sizes"
-          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <label
+          for="sizes"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Sizes</label>
+        <input
+          type="text"
+          id="sizes"
+          name="sizes"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor"/>
       </div>
 
       <div class="relative mt-4">
-        <label for="colors"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">colors</label>
-        <input type="text" id="colors"
-          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <label
+          for="colors"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Colors</label>
+        <input
+          type="text"
+          id="colors"
+          name="colors"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor"/>
       </div>
 
       <div class="relative mt-4">
-        <label for="price"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">price</label>
-        <input type="text" id="price"
-          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <label
+          for="price"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Price</label>
+        <input
+          type="text"
+          id="price"
+          name="price"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor"/>
       </div>
 
       <div class="relative mt-4">
-        <label for="quantity"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">quantity</label>
-        <input type="text" id="quantity"
-          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <label
+          for="quantity"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Quantity</label>
+        <input
+          type="text"
+          id="quantity"
+          name="quantity"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor"/>
       </div>
 
       <div class="relative mt-4">
-        <label for="category"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">category</label>
-        <input type="text" id="category"
-          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <label
+          for="category"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Category</label>
+        <input
+          type="text"
+          id="category"
+          name="category"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor"/>
       </div>
 
       <div class="relative mt-4">
-        <label for="subcategory"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">subcategory</label>
-        <input type="text" id="subcategory"
-          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <label
+          for="subcategory"
+          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Subcategory</label>
+        <input
+          type="text"
+          id="subcategory"
+          name="subcategory"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor"/>
       </div>
 
       <div class="mt-6 sm:text-right">
-        <button class="px-12 py-2 text-[16px] text-white bg-primary rounded-[16px]">
+        <button type="submit"class="px-12 py-2 text-[16px] text-white bg-primary rounded-[16px]">
           Save
         </button>
       </div>

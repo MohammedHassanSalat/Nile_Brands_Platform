@@ -26,24 +26,29 @@ export class WishlistService {
   }
 
   addToWishlist(product: any) {
-    if (!this.isInWishlist(product.id)) {
-      this.wishlist.push(product);
+    const productId = Number(product.id);
+    if (!this.isInWishlist(productId)) {
+      const productToStore = { ...product, id: productId };
+      this.wishlist.push(productToStore);
       this.saveWishlistToStorage();
     }
   }
 
-  removeFromWishlist(productId: number) {
-    this.wishlist = this.wishlist.filter(item => item.id !== productId);
+  removeFromWishlist(productId: string | number) {
+    const numericId = Number(productId);
+    this.wishlist = this.wishlist.filter(item => Number(item.id) !== numericId);
     this.saveWishlistToStorage();
   }
 
-  isInWishlist(productId: number): boolean {
-    return this.wishlist.some(item => item.id === productId);
+  isInWishlist(productId: string | number): boolean {
+    const numericId = Number(productId);
+    return this.wishlist.some(item => Number(item.id) === numericId);
   }
 
   toggleWishlist(product: any) {
-    if (this.isInWishlist(product.id)) {
-      this.removeFromWishlist(product.id);
+    const productId = Number(product.id);
+    if (this.isInWishlist(productId)) {
+      this.removeFromWishlist(productId);
     } else {
       this.addToWishlist(product);
     }
