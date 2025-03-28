@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { ProductsService } from '../../services/products/products.service';
 
 @Component({
   selector: 'app-home',
@@ -15,16 +15,13 @@ export class HomeComponent implements OnInit {
   products: any[] = [];
   categories: any[] = [];
   subcategories: any[] = [];
-
-  // API base URL
-  apiUrl = 'https://nile-brands.up.railway.app/api/v1';
   selectedCategory: string = 'All';
   selectedSubcategory: string = 'All';
   filteredProducts: any[] = [];
   visibleProductsCount = 15;
 
   constructor(
-    private http: HttpClient,
+    private productsService: ProductsService,
     private router: Router
   ) { }
 
@@ -34,45 +31,38 @@ export class HomeComponent implements OnInit {
     this.fetchAllSubcategories();
   }
 
-  // Fetch all categories.
+  // Get categories and prepend an "All" option.
   fetchCategories() {
-    this.http.get<any>(`${this.apiUrl}/categories`).subscribe({
+    this.productsService.getCategories().subscribe({
       next: (response) => {
-        // Add an "All" option at the beginning.
         this.categories = [{ name: 'All', id: 'all-id' }, ...response.data];
       },
-      error: (err) => {
-        console.error('Error fetching categories', err);
-      }
+      error: (err) => console.error('Error fetching categories', err)
     });
   }
 
-  // Fetch all products.
+  // Get all products and initialize filteredProducts.
   fetchProducts() {
-    this.http.get<any>(`${this.apiUrl}/products?limit=9999`).subscribe({
+    this.productsService.getProducts().subscribe({
       next: (response) => {
         this.products = response.data || [];
         this.filteredProducts = [...this.products];
       },
-      error: (err) => {
-        console.error('Error fetching products', err);
-      }
+      error: (err) => console.error('Error fetching products', err)
     });
   }
 
-  // Fetch all subcategories (used when "All" category is selected).
+  // Get all subcategories.
   fetchAllSubcategories() {
-    this.http.get<any>(`${this.apiUrl}/subcategories?limit=9999`).subscribe({
+    this.productsService.getAllSubcategories().subscribe({
       next: (response) => {
         this.subcategories = response.data || [];
       },
-      error: (err) => {
-        console.error('Error fetching subcategories', err);
-      }
+      error: (err) => console.error('Error fetching subcategories', err)
     });
   }
 
-  // Return subcategories for the given category name.
+  // Filter subcategories for a given category.
   getSubcategoriesForCategory(categoryName: string) {
     if (categoryName === 'All') {
       return [];
@@ -82,70 +72,70 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  // Helper method to return filtered products for a given subcategory.
+  // Return products for a subcategory with a limit.
   getProductsForSubcategory(subcatName: string): any[] {
     return this.filteredProducts
       .filter(p => p.subcategory?.name === subcatName)
       .slice(0, this.visibleProductsCount);
   }
 
-  // Called when a category is clicked.
+  // When a category is clicked, update filteredProducts and subcategories.
   filterCategory(category: any) {
     this.selectedCategory = category.name;
     this.selectedSubcategory = 'All';
     this.visibleProductsCount = 15;
 
     if (category.name === 'All') {
-      // Show all products and subcategories.
       this.filteredProducts = [...this.products];
       this.fetchAllSubcategories();
     } else {
-      // Fetch category details (which include its products).
-      this.http.get<any>(`${this.apiUrl}/categories/${category.id}`).subscribe({
+      // Get products associated with this category.
+      this.productsService.getCategoryProducts(category.id).subscribe({
         next: (response) => {
           this.filteredProducts = response.data.products || [];
         },
-        error: (err) => {
-          console.error('Error fetching category products', err);
-        }
+        error: (err) => console.error('Error fetching category products', err)
       });
-      // Fetch subcategories for the selected category.
-      this.http.get<any>(`${this.apiUrl}/categories/${category.id}/subcategories`).subscribe({
+      // Get subcategories for this category.
+      this.productsService.getCategorySubcategories(category.id).subscribe({
         next: (response) => {
           this.subcategories = response.data || [];
         },
         error: (err) => {
-          console.error('Error fetching subcategories for category', err);
+          if (err.status === 404) {
+            console.error('Subcategories not found for this category.', err);
+            this.subcategories = [];
+          } else {
+            console.error('Error fetching subcategories for category', err);
+          }
         }
       });
     }
   }
 
-  // Called when a subcategory is clicked.
+  // When a subcategory is clicked, update the filtered products.
   filterSubcategory(subcat: any) {
     this.selectedSubcategory = subcat.name;
     this.visibleProductsCount = 15;
 
     if (subcat.name === 'All') {
-      // Revert to showing all products for the selected category
       this.filterCategory({ name: this.selectedCategory, id: 'all-id' });
     } else {
-      // Fetch only this subcategory's products
-      this.http.get<any>(`${this.apiUrl}/subcategories/${subcat.id}`).subscribe({
+      this.productsService.getSubcategoryProducts(subcat.id).subscribe({
         next: (response) => {
           this.filteredProducts = response.data.products || [];
         },
-        error: (err) => {
-          console.error('Error fetching subcategory products', err);
-        }
+        error: (err) => console.error('Error fetching subcategory products', err)
       });
     }
   }
 
+  // Load more products by increasing the count.
   seeMore() {
     this.visibleProductsCount += 15;
   }
 
+  // Tracking function for ngFor.
   trackByProductId(index: number, product: any) {
     return product.id;
   }
