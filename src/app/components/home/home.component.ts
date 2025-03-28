@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProductsService } from '../../services/products/products.service';
+import { GlobalService } from '../../services/global/global.service';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +23,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private productsService: ProductsService,
-    private router: Router
+    private router: Router,
+    private globalService: GlobalService
   ) { }
 
   ngOnInit() {
@@ -31,7 +33,7 @@ export class HomeComponent implements OnInit {
     this.fetchAllSubcategories();
   }
 
-  // Get categories and prepend an "All" option.
+  // Get categories
   fetchCategories() {
     this.productsService.getCategories().subscribe({
       next: (response) => {
@@ -41,7 +43,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  // Get all products and initialize filteredProducts.
+  // Get all products
   fetchProducts() {
     this.productsService.getProducts().subscribe({
       next: (response) => {
@@ -134,9 +136,16 @@ export class HomeComponent implements OnInit {
   seeMore() {
     this.visibleProductsCount += 15;
   }
-
-  // Tracking function for ngFor.
   trackByProductId(index: number, product: any) {
     return product.id;
+  }
+  getProductImageUrl(product: any): string {
+    if (
+      product.coverImage &&
+      !product.coverImage.startsWith('http')
+    ) {
+      return `${this.globalService.apiUrl}/products/${product.coverImage}`;
+    }
+    return product.coverImage;
   }
 }

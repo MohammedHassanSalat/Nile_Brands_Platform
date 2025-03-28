@@ -30,7 +30,7 @@
         {{ category.name.charAt(0).toUpperCase() + category.name.slice(1) }}
       </a>
 
-      <!-- Dropdown for subcategories if available -->
+      <!-- Dropdown for subcategories-->
       <div *ngIf="getSubcategoriesForCategory(category.name).length > 0"
         class="absolute left-0 mt-2 w-48 bg-white text-fontColor hover:text-primary hover:font-bold shadow-lg rounded-md border border-primary opacity-0 delay-500 scale-50 pointer-events-none transform translate-y-2 transition-all duration-150 z-50 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:pointer-events-auto">
         <!-- Triangle Arrow -->
@@ -60,7 +60,8 @@
         *ngFor="let product of filteredProducts.slice(0, visibleProductsCount); trackBy: trackByProductId">
         <!-- Image Section -->
         <div class="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden rounded-md">
-          <img [src]="product.coverImage" alt="{{ product.name }}" class="w-full h-full object-cover rounded-md p-1" />
+          <img [src]="getProductImageUrl(product)" alt="{{ product.name }}"
+            class="w-full h-full object-cover rounded-md p-1" />
           <!-- Wishlist Icon -->
           <button class="absolute bottom-2 right-2 text-lg transition-all text-fontColor hover:text-[#A61717]">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 13 12" xmlns="http://www.w3.org/2000/svg">
@@ -108,9 +109,8 @@
     class="mt-7 px-4 sm:px-20 lg:px-16 xl:px-20 2xl:px-24 max-w-[1400px] mx-auto">
 
     <!-- Hide other subcategories if one is selected -->
-    <div *ngFor="let subcat of getSubcategoriesForCategory(selectedCategory)"
-         class="mb-12"
-         [hidden]="selectedSubcategory !== 'All' && subcat.name !== selectedSubcategory">
+    <div *ngFor="let subcat of getSubcategoriesForCategory(selectedCategory)" class="mb-12"
+      [hidden]="selectedSubcategory !== 'All' && subcat.name !== selectedSubcategory">
 
       <!-- Subcategory Title -->
       <h3 class="text-xl font-semibold text-fontColor mb-4">
@@ -123,7 +123,7 @@
           *ngFor="let product of getProductsForSubcategory(subcat.name); trackBy: trackByProductId">
           <!-- Image Section -->
           <div class="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden rounded-md">
-            <img [src]="product.coverImage" alt="{{ product.name }}"
+            <img [src]="getProductImageUrl(product)" alt="{{ product.name }}"
               class="w-full h-full object-cover rounded-md p-1" />
             <!-- Wishlist Icon -->
             <button class="absolute bottom-2 right-2 text-lg transition-all text-fontColor hover:text-[#A61717]">

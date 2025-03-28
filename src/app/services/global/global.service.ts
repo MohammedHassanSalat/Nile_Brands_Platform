@@ -4,6 +4,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class GlobalService {
-  //  API base URL.
+  // API base URL 
   apiUrl = 'https://nile-brands.up.railway.app';
 }
