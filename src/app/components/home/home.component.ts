@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProductsService } from '../../services/products/products.service';
 import { GlobalService } from '../../services/global/global.service';
+import { CategoriesService } from '../../services/categories/categories.service';
+import { SubCategoriesService } from '../../services/subCategories/sub-categories.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   home_page: string = 'images/images ui/home.png';
@@ -24,8 +26,10 @@ export class HomeComponent implements OnInit {
   constructor(
     private productsService: ProductsService,
     private router: Router,
-    private globalService: GlobalService
-  ) { }
+    private globalService: GlobalService,
+    private CategoriesService: CategoriesService,
+    private SubCategoriesService: SubCategoriesService
+  ) {}
 
   ngOnInit() {
     this.fetchCategories();
@@ -35,11 +39,11 @@ export class HomeComponent implements OnInit {
 
   // Get categories
   fetchCategories() {
-    this.productsService.getCategories().subscribe({
+    this.CategoriesService.getCategories().subscribe({
       next: (response) => {
         this.categories = [{ name: 'All', id: 'all-id' }, ...response.data];
       },
-      error: (err) => console.error('Error fetching categories', err)
+      error: (err) => console.error('Error fetching categories', err),
     });
   }
 
@@ -50,17 +54,17 @@ export class HomeComponent implements OnInit {
         this.products = response.data || [];
         this.filteredProducts = [...this.products];
       },
-      error: (err) => console.error('Error fetching products', err)
+      error: (err) => console.error('Error fetching products', err),
     });
   }
 
   // Get all subcategories.
   fetchAllSubcategories() {
-    this.productsService.getAllSubcategories().subscribe({
+    this.SubCategoriesService.getAllSubcategories().subscribe({
       next: (response) => {
         this.subcategories = response.data || [];
       },
-      error: (err) => console.error('Error fetching subcategories', err)
+      error: (err) => console.error('Error fetching subcategories', err),
     });
   }
 
@@ -70,14 +74,15 @@ export class HomeComponent implements OnInit {
       return [];
     }
     return this.subcategories.filter(
-      (subcat) => subcat.category?.name.toLowerCase() === categoryName.toLowerCase()
+      (subcat) =>
+        subcat.category?.name.toLowerCase() === categoryName.toLowerCase()
     );
   }
 
   // Return products for a subcategory with a limit.
   getProductsForSubcategory(subcatName: string): any[] {
     return this.filteredProducts
-      .filter(p => p.subcategory?.name === subcatName)
+      .filter((p) => p.subcategory?.name === subcatName)
       .slice(0, this.visibleProductsCount);
   }
 
@@ -92,14 +97,14 @@ export class HomeComponent implements OnInit {
       this.fetchAllSubcategories();
     } else {
       // Get products associated with this category.
-      this.productsService.getCategoryProducts(category.id).subscribe({
+      this.CategoriesService.getCategoryProducts(category.id).subscribe({
         next: (response) => {
           this.filteredProducts = response.data.products || [];
         },
-        error: (err) => console.error('Error fetching category products', err)
+        error: (err) => console.error('Error fetching category products', err),
       });
       // Get subcategories for this category.
-      this.productsService.getCategorySubcategories(category.id).subscribe({
+      this.CategoriesService.getCategorySubcategories(category.id).subscribe({
         next: (response) => {
           this.subcategories = response.data || [];
         },
@@ -110,7 +115,7 @@ export class HomeComponent implements OnInit {
           } else {
             console.error('Error fetching subcategories for category', err);
           }
-        }
+        },
       });
     }
   }
@@ -123,11 +128,12 @@ export class HomeComponent implements OnInit {
     if (subcat.name === 'All') {
       this.filterCategory({ name: this.selectedCategory, id: 'all-id' });
     } else {
-      this.productsService.getSubcategoryProducts(subcat.id).subscribe({
+      this.SubCategoriesService.getSubcategoryProducts(subcat.id).subscribe({
         next: (response) => {
           this.filteredProducts = response.data.products || [];
         },
-        error: (err) => console.error('Error fetching subcategory products', err)
+        error: (err) =>
+          console.error('Error fetching subcategory products', err),
       });
     }
   }
@@ -140,10 +146,7 @@ export class HomeComponent implements OnInit {
     return product.id;
   }
   getProductImageUrl(product: any): string {
-    if (
-      product.coverImage &&
-      !product.coverImage.startsWith('http')
-    ) {
+    if (product.coverImage && !product.coverImage.startsWith('http')) {
       return `${this.globalService.apiUrl}/products/${product.coverImage}`;
     }
     return product.coverImage;
