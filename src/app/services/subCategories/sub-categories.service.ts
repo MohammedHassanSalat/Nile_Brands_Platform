@@ -11,13 +11,13 @@ export class SubCategoriesService {
 
   // Fetch all subcategories.
   getAllSubcategories(): Observable<any> {
-    const url = `${this.globalService.apiUrl}/api/v1/subcategories?limit=9999`;
+    const url = `${this.globalService.apiUrl}/subcategories?limit=9999`;
     return this.http.get<any>(url);
   }
 
   // Fetch products for a specific subcategory.
   getSubcategoryProducts(subcatId: string): Observable<any> {
-    const url = `${this.globalService.apiUrl}/api/v1/subcategories/${subcatId}`;
+    const url = `${this.globalService.apiUrl}/subcategories/${subcatId}`;
     return this.http.get<any>(url);
   }
 }

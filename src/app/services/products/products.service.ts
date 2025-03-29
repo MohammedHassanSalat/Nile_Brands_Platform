@@ -14,7 +14,7 @@ export class ProductsService {
 
   // Fetch all products.
   getProducts(): Observable<any> {
-    const url = `${this.globalService.apiUrl}/api/v1/products?limit=9999`;
+    const url = `${this.globalService.apiUrl}/products?limit=9999`;
     return this.http.get<any>(url);
   }
 }

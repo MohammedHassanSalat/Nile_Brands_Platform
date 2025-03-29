@@ -11,19 +11,19 @@ export class CategoriesService {
 
   // Fetch all categories.
   getCategories(): Observable<any> {
-    const url = `${this.globalService.apiUrl}/api/v1/categories`;
+    const url = `${this.globalService.apiUrl}/categories`;
     return this.http.get<any>(url);
   }
 
   // Fetch details of a category including its products.
   getCategoryProducts(categoryId: string): Observable<any> {
-    const url = `${this.globalService.apiUrl}/api/v1/categories/${categoryId}`;
+    const url = `${this.globalService.apiUrl}/categories/${categoryId}`;
     return this.http.get<any>(url);
   }
 
   // Fetch subcategories for a given category.
   getCategorySubcategories(categoryId: string): Observable<any> {
-    const url = `${this.globalService.apiUrl}/api/v1/categories/${categoryId}/subcategories`;
+    const url = `${this.globalService.apiUrl}/categories/${categoryId}/subcategories`;
     return this.http.get<any>(url);
   }
 }
