@@ -3,7 +3,7 @@
     <img class="w-full max-w-[480px]" src="images/images ui/authnilebrand.png">
     <img class="absolute w-[120px] inset-0 top-[40%] mx-auto" src="images/images ui/nile brand.png">
   </div>
-  <div class="w-full h-[600px] max-w-[375px] p-6">
+  <div class="w-full min-h-[600px] max-w-[375px] p-6">
     <div>
       <h2 class="text-[28px] md:text-[35px] font-[700] text-fontColor text-center md:text-left">Login</h2>
     </div>
@@ -12,24 +12,40 @@
       <p class="text-[20px] text-secondary">Welcome back to Nile brand</p>
     </div>
 
-    <form class="mt-8">
+    <form class="mt-8" [formGroup]="loginForm" (ngSubmit)="login(loginForm)">
 
       <div class="relative">
         <label for="email"
           class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">E-mail</label>
-        <input type="email" id="email" placeholder="hello@gmail.com" class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg placeholder:text-placeholder" />
+        <input type="email" id="email" formControlName="email" placeholder="hello@gmail.com"
+          class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg placeholder:text-placeholder" />
+        @if (loginForm.get('email')?.errors !== null && loginForm.get('email')?.touched) {
+        <div class="text-red-500 text-sm mt-1">
+          @if(loginForm.get('email')?.errors?.['required']){<p>Email Required</p>}
+          @if(loginForm.get('email')?.errors?.['email']) {<p>invalid email</p>}
+        </div>
+        }
       </div>
 
       <div class="relative mt-6">
         <label for="password"
           class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Password</label>
-        <input type="password" id="password" placeholder="........." class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg placeholder:text-[40px] placeholder:text-placeholder" />
-        <span class="text-[#A61717] text-[14px] float-end mt-2 cursor-pointer">Forgot Password?</span>
+        <input type="password" id="password" formControlName="password" placeholder="........."
+          class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg placeholder:text-[40px] placeholder:text-placeholder" />
+        <span [routerLink]="['/forgetpassword']" routerLinkActive="router-link-active"
+          class="text-[#A61717] text-[14px] float-end mt-2 cursor-pointer">Forgot Password?</span>
+        @if (loginForm.get('password')?.errors !== null && loginForm.get('password')?.touched) {
+        <div class="text-red-500 text-sm mt-1">
+          @if(loginForm.get('password')?.errors?.['required']){<p>Password Required</p>}
+        </div>
+        }
       </div>
+      <div *ngIf="invalidLoginMsg" class="text-red-500 text-sm mt-1">{{ invalidLoginMsg }}</div>
 
 
       <div class="mt-12">
-        <button class="w-full px-6 py-2 text-[16px] md:text-[20px] text-white bg-primary rounded-full">
+        <button [disabled]="loginForm.invalid"
+          class="w-full px-6 py-2 text-[16px] md:text-[20px] text-white bg-primary rounded-full">
           Login
         </button>
       </div>
@@ -38,15 +54,16 @@
     <div class="flex items-center justify-between mt-6">
       <span class="w-1/3 border-b lg:w-1/3"></span>
 
-      <a href="#" class="text-[14px] md:text-[16px] text-center text-secondary hover:underline">
+      <p class="text-[14px] md:text-[16px] text-center text-secondary hover:underline">
         or sing in with
-      </a>
+      </p>
 
       <span class="w-1/3 border-b lg:w-1/3"></span>
     </div>
 
     <div class="mt-6">
-      <a href="#" class="flex items-center justify-center px-6 py-3 mt-4 text-[16px] md:text-[20px] text-secondary bg-none">
+      <a href="#"
+        class="flex items-center justify-center px-6 py-3 mt-4 text-[16px] md:text-[20px] text-secondary bg-none">
         <svg class="w-6 h-6 mt-1" viewBox="0 0 40 40">
           <path
             d="M36.3425 16.7358H35V16.6667H20V23.3333H29.4192C28.045 27.2142 24.3525 30 20 30C14.4775 30 10 25.5225 10 20C10 14.4775 14.4775 9.99999 20 9.99999C22.5492 9.99999 24.8683 10.9617 26.6342 12.5325L31.3483 7.81833C28.3717 5.04416 24.39 3.33333 20 3.33333C10.7958 3.33333 3.33335 10.7958 3.33335 20C3.33335 29.2042 10.7958 36.6667 20 36.6667C29.2042 36.6667 36.6667 29.2042 36.6667 20C36.6667 18.8825 36.5517 17.7917 36.3425 16.7358Z"
@@ -67,7 +84,8 @@
     </div>
 
     <div class="mt-8">
-      <p class="text-[13px] text-center font-[500] cursor-pointer" [routerLink]="['/register']" routerLinkActive="router-link-active">Don't have an account <span class="text-primary">sign up now</span></p>
+      <p class="text-[13px] text-center font-[500] cursor-pointer" [routerLink]="['/register']"
+        routerLinkActive="router-link-active">Don't have an account <span class="text-primary">sign up now</span></p>
     </div>
 
 
