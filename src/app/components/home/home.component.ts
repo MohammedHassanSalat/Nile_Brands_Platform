@@ -147,7 +147,7 @@ export class HomeComponent implements OnInit {
   }
   getProductImageUrl(product: any): string {
     if (product.coverImage && !product.coverImage.startsWith('http')) {
-      return `https://nile-brands.up.railway.app/products/${product.coverImage}`;
+      return `${this.globalService.apiUrl}/products/${product.coverImage}`;
     }
     return product.coverImage;
   }
