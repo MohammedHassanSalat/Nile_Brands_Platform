@@ -37,8 +37,16 @@ export class SignupComponent {
         next: (res) => {
           if (res.token) {
             localStorage.setItem('user', res.token);
-            this.AuthService.saveCurrentUser();
-            this.Router.navigate(['/home']);
+            if (res.data?.role) {
+              this.AuthService.currentUser.next(res.data);
+              if (res.data?.role === 'user') {
+                this.Router.navigate(['/home']);
+              } else if (res.data?.role === 'owner') {
+                this.Router.navigate(['/createbrand']);
+              } else {
+                this.Router.navigate(['/home']);
+              }
+            }
           }
         },
         error: (err) => {

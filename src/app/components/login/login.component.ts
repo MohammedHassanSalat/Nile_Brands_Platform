@@ -4,7 +4,6 @@ import { AuthService } from '../../services/auth/auth.service';
 import {
   FormControl,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -33,8 +32,21 @@ export class LoginComponent {
         next: (res) => {
           if (res.token) {
             localStorage.setItem('user', res.token);
-            this.AuthService.saveCurrentUser();
-            this.Router.navigate(['/home']);
+            this.AuthService.getLoggedUser().subscribe({
+              next: (userRes) => {
+                const role = userRes.data?.role;
+                this.AuthService.currentUser.next(userRes.data);
+                if (role === 'user') {
+                  this.Router.navigate(['/home']);
+                } else if (role === 'owner') {
+                  this.Router.navigate(['/dashboard/hero']);
+                }
+              },
+              error: (err) => {
+                console.error('Error fetching user data:', err);
+                this.Router.navigate(['/home']);
+              },
+            });
           }
         },
         error: (err) => {

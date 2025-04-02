@@ -3,29 +3,35 @@ import { GlobalService } from '../global/global.service';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Login, Signup } from '../../interfaces/auth';
-import { jwtDecode } from 'jwt-decode';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(
-    private http: HttpClient,
-    private globalService: GlobalService,
-    private Router: Router
-  ) {
-    if (localStorage.getItem('user') !== null) {
-      this.saveCurrentUser();
-    }
+  constructor(private http: HttpClient, private globalService: GlobalService) {
+    this.restoreUser();
   }
 
   currentUser = new BehaviorSubject<any>(null);
 
-  saveCurrentUser() {
-    const token: any = localStorage.getItem('user');
+  getLoggedUser(): Observable<any> {
+    const url = `${this.globalService.apiUrl}/api/v1/users/me`;
+    return this.http.get<any>(url, {
+      headers: { authorization: `Bearer ${localStorage.getItem('user')}` },
+    });
+  }
+
+  private restoreUser() {
+    const token = localStorage.getItem('user');
     if (token) {
-      this.currentUser.next(jwtDecode(token));
+      this.getLoggedUser().subscribe({
+        next: (res) => this.currentUser.next(res.data),
+        error: (err) => {
+          console.error('Failed to restore user:', err);
+          localStorage.removeItem('user');
+          this.currentUser.next(null);
+        },
+      });
     }
   }
 
