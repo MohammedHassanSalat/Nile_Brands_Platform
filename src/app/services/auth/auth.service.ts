@@ -13,6 +13,7 @@ export class AuthService {
   }
 
   currentUser = new BehaviorSubject<any>(null);
+  private isRestored = new BehaviorSubject<boolean>(false); // Tracks restoration
 
   getLoggedUser(): Observable<any> {
     const url = `${this.globalService.apiUrl}/api/v1/users/me`;
@@ -21,18 +22,32 @@ export class AuthService {
     });
   }
 
-  private restoreUser() {
-    const token = localStorage.getItem('user');
-    if (token) {
-      this.getLoggedUser().subscribe({
-        next: (res) => this.currentUser.next(res.data),
-        error: (err) => {
-          console.error('Failed to restore user:', err);
-          localStorage.removeItem('user');
-          this.currentUser.next(null);
-        },
-      });
-    }
+  restoreUser(): Promise<void> {
+    return new Promise((resolve) => {
+      const token = localStorage.getItem('user');
+      if (token) {
+        this.getLoggedUser().subscribe({
+          next: (res) => {
+            this.currentUser.next(res.data);
+            this.isRestored.next(true);
+            resolve();
+          },
+          error: () => {
+            localStorage.removeItem('user');
+            this.currentUser.next(null);
+            this.isRestored.next(true);
+            resolve();
+          },
+        });
+      } else {
+        this.isRestored.next(true);
+        resolve();
+      }
+    });
+  }
+
+  isUserRestored(): Observable<boolean> {
+    return this.isRestored.asObservable();
   }
 
   signup(formData: Signup): Observable<any> {
