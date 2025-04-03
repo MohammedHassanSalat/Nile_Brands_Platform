@@ -15,17 +15,25 @@
     </div>
 
 
-    <form class="mt-12">
+    <form class="mt-12" [formGroup]="forgetPasswordForm" (ngSubmit)="sendMail(forgetPasswordForm)">
 
       <div class="relative">
         <label for="email"
           class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">E-mail</label>
-        <input type="email" id="email" placeholder="hello@gmail.com" class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg placeholder:text-placeholder" />
+        <input type="email" id="email" formControlName="email" placeholder="hello@gmail.com" class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg placeholder:text-placeholder" />
+        @if (forgetPasswordForm.get('email')?.errors !== null && forgetPasswordForm.get('email')?.touched) {
+        <div class="text-red-500 text-sm mt-1">
+          @if(forgetPasswordForm.get('email')?.errors?.['required']){<p>Email Required</p>}
+          @if(forgetPasswordForm.get('email')?.errors?.['email']) {<p>invalid email</p>}
+        </div>
+        }
       </div>
+      <div *ngIf="invalidMsg" class="text-red-500 text-sm mt-1">{{ invalidMsg }}</div>
+
 
 
       <div class="mt-12">
-        <button class="w-full px-6 py-2 text-[16px] md:text-[20px] text-white bg-primary rounded-full">
+        <button [disabled]="forgetPasswordForm.invalid" class="w-full px-6 py-2 text-[16px] md:text-[20px] text-white bg-primary rounded-full">
           Password Reset
         </button>
       </div>
