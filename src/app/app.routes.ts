@@ -17,6 +17,7 @@ import { HeroComponent } from './components/brandDashboard/hero/hero.component';
 import { AddproductComponent } from './components/brandDashboard/addproduct/addproduct.component';
 import { ProfileComponent } from './components/brandDashboard/profile/profile.component';
 import { UpdatebrandComponent } from './components/brandDashboard/updatebrand/updatebrand.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -26,21 +27,58 @@ export const routes: Routes = [
   { path: 'resetpassword', component: ResetPasswordComponent },
   { path: 'verifyemail', component: VerifyemailComponent },
   { path: 'signin', component: LoginComponent },
-  { path: 'wishlist', component: WishlistComponent },
-  { path: 'cart', component: CartComponent },
-  { path: 'editprofile', component: EditprofileComponent },
-  { path: 'feedback', component: FeedbackComponent },
-  { path: 'trackorder', component: TrackorderComponent },
-  { path: 'productdetails', component: ProductdetailsComponent },
-  { path: 'createbrand', component: CreatebrandComponent },
+  {
+    path: 'wishlist',
+    component: WishlistComponent,
+    canActivate: [authGuard],
+    data: { roles: ['user'] },
+  },
+  {
+    path: 'cart',
+    component: CartComponent,
+    canActivate: [authGuard],
+    data: { roles: ['user'] },
+  },
+  {
+    path: 'editprofile',
+    component: EditprofileComponent,
+    canActivate: [authGuard],
+    data: { roles: ['user'] },
+  },
+  {
+    path: 'feedback',
+    component: FeedbackComponent,
+    canActivate: [authGuard],
+    data: { roles: ['user'] },
+  },
+  {
+    path: 'trackorder',
+    component: TrackorderComponent,
+    canActivate: [authGuard],
+    data: { roles: ['user'] },
+  },
+  {
+    path: 'productdetails',
+    component: ProductdetailsComponent,
+    canActivate: [authGuard],
+    data: { roles: ['user'] },
+  },
+  {
+    path: 'createbrand',
+    component: CreatebrandComponent,
+    canActivate: [authGuard],
+    data: { roles: ['owner'] },
+  },
   {
     path: 'dashboard',
+    canActivate: [authGuard],
+    data: { roles: ['owner'] },
     component: OwnerDashboardComponent,
     children: [
       { path: 'hero', component: HeroComponent },
       { path: 'addproduct', component: AddproductComponent },
       { path: 'profile', component: ProfileComponent },
-      { path: 'updatebrand', component: UpdatebrandComponent }
-    ]
-  }
+      { path: 'updatebrand', component: UpdatebrandComponent },
+    ],
+  },
 ];
