@@ -67,9 +67,15 @@ export class AuthService {
 
   verifyResetCode(resetCode: string): Observable<any> {
     const url = `${this.globalService.apiUrl}/api/v1/auth/verifyCode`;
-    return this.http.post<any>(url, {resetCode}, {
-      headers: { authorization: `Bearer ${localStorage.getItem('resetToken')}` },
-    });
+    return this.http.post<any>(
+      url,
+      { resetCode },
+      {
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('resetToken')}`,
+        },
+      }
+    );
   }
 
   resetPassword(formData: resetPassword): Observable<any> {
@@ -79,5 +85,10 @@ export class AuthService {
         authorization: `Bearer ${localStorage.getItem('resetToken')}`,
       },
     });
+  }
+
+  logout() {
+    localStorage.removeItem('user');
+    this.currentUser.next(null);
   }
 }
