@@ -26,7 +26,11 @@ export const authGuard: CanActivateFn = (route, state) => {
         return true;
       }
 
-      router.navigate(['/home']);
+      if (user.role == 'owner' || user.role == 'admin') {
+        router.navigate(['/dashboard/hero']);
+      } else {
+        router.navigate(['/home']);
+      }
       return false;
     })
   );
