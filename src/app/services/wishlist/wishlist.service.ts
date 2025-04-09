@@ -1,56 +1,89 @@
 import { Injectable } from '@angular/core';
+import { GlobalService } from '../global/global.service';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { WishlistProduct } from '../../interfaces/wishlist';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WishlistService {
-  private wishlist: any[] = [];
+  private wishlistUrl: string;
+  private wishlistSubject = new BehaviorSubject<WishlistProduct[]>([]);
+  public wishlist$ = this.wishlistSubject.asObservable();
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  public loading$ = this.loadingSubject.asObservable();
 
-  constructor() {
-    this.loadWishlistFromStorage();
+  constructor(
+    private http: HttpClient,
+    private global: GlobalService,
+    private router: Router
+  ) {
+    this.wishlistUrl = `${this.global.apiUrl}/api/v1/wishlist`;
   }
 
-  private loadWishlistFromStorage() {
-    const stored = localStorage.getItem('wishlist');
-    if (stored) {
-      this.wishlist = JSON.parse(stored);
+  loadWishlist(): void {
+    const token = localStorage.getItem('token');
+    this.loadingSubject.next(true);
+    if (!token) {
+      this.wishlistSubject.next([]);
+      this.loadingSubject.next(false);
+      return;
     }
+
+    this.http.get<{ data: WishlistProduct[] }>(this.wishlistUrl).subscribe({
+      next: (res) => {
+        this.wishlistSubject.next(res.data);
+        this.loadingSubject.next(false);
+      },
+      error: (err) => {
+        console.error('Error loading wishlist:', err);
+        this.wishlistSubject.next([]);
+        this.loadingSubject.next(false);
+      }
+    });
   }
 
-  private saveWishlistToStorage() {
-    localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
+  getWishlist(): WishlistProduct[] {
+    return this.wishlistSubject.getValue();
   }
 
-  getWishlist() {
-    return this.wishlist;
+  isInWishlist(product: WishlistProduct): boolean {
+    return this.getWishlist().some(p => (p.id || p._id) === (product.id || product._id));
   }
 
-  addToWishlist(product: any) {
-    const productId = Number(product.id);
-    if (!this.isInWishlist(productId)) {
-      const productToStore = { ...product, id: productId };
-      this.wishlist.push(productToStore);
-      this.saveWishlistToStorage();
+  addToWishlist(product: WishlistProduct): Observable<any> {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.router.navigate(['/signin'], { queryParams: { returnUrl: this.router.url } });
+      return throwError(() => new Error('Not authenticated'));
     }
+
+    const payload = { product: product.id || product._id };
+    return this.http.post<any>(this.wishlistUrl, payload).pipe(
+      tap(() => this.loadWishlist())
+    );
   }
 
-  removeFromWishlist(productId: string | number) {
-    const numericId = Number(productId);
-    this.wishlist = this.wishlist.filter(item => Number(item.id) !== numericId);
-    this.saveWishlistToStorage();
+  removeFromWishlist(productId: string): Observable<any> {
+    return this.http.delete<any>(`${this.wishlistUrl}/${productId}`).pipe(
+      tap(() => this.loadWishlist())
+    );
   }
 
-  isInWishlist(productId: string | number): boolean {
-    const numericId = Number(productId);
-    return this.wishlist.some(item => Number(item.id) === numericId);
-  }
-
-  toggleWishlist(product: any) {
-    const productId = Number(product.id);
-    if (this.isInWishlist(productId)) {
-      this.removeFromWishlist(productId);
+  toggleWishlist(product: WishlistProduct): void {
+    const productId = product.id || product._id;
+    if (this.isInWishlist(product)) {
+      this.removeFromWishlist(productId).subscribe();
     } else {
-      this.addToWishlist(product);
+      this.addToWishlist(product).subscribe();
     }
+  }
+
+  clearWishlist(): void {
+    this.wishlistSubject.next([]);
+    this.loadingSubject.next(false);
   }
 }

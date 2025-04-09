@@ -5,6 +5,7 @@ import { ProductsService } from '../../services/products/products.service';
 import { GlobalService } from '../../services/global/global.service';
 import { CategoriesService } from '../../services/categories/categories.service';
 import { SubCategoriesService } from '../../services/subCategories/sub-categories.service';
+import { WishlistService } from '../../services/wishlist/wishlist.service';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +16,7 @@ import { SubCategoriesService } from '../../services/subCategories/sub-categorie
 })
 export class HomeComponent implements OnInit {
   home_page: string = 'images/images ui/home.png';
+  logo = 'images/images ui/nile brand.png';
   products: any[] = [];
   categories: any[] = [];
   subcategories: any[] = [];
@@ -23,70 +25,43 @@ export class HomeComponent implements OnInit {
   filteredProducts: any[] = [];
   visibleProductsCount = 15;
 
+  isLoading: boolean = true; 
+
   constructor(
     private productsService: ProductsService,
     private router: Router,
     private globalService: GlobalService,
     private CategoriesService: CategoriesService,
-    private SubCategoriesService: SubCategoriesService
-  ) {}
+    private SubCategoriesService: SubCategoriesService,
+    public wishlistService: WishlistService
+  ) { }
 
   ngOnInit() {
-    this.fetchCategories();
-    this.fetchProducts();
-    this.fetchAllSubcategories();
+    this.loadData();
   }
 
-  // Get categories
-  fetchCategories() {
-    this.CategoriesService.getCategories().subscribe({
-      next: (response) => {
-        this.categories = [{ name: 'All', id: 'all-id' }, ...response.data];
-      },
-      error: (err) => console.error('Error fetching categories', err),
-    });
-  }
+  loadData() {
+    this.isLoading = true;
 
-  // Get all products
-  fetchProducts() {
-    this.productsService.getProducts().subscribe({
-      next: (response) => {
-        this.products = response.data || [];
+    Promise.all([
+      this.CategoriesService.getCategories().toPromise(),
+      this.productsService.getProducts().toPromise(),
+      this.SubCategoriesService.getAllSubcategories().toPromise(),
+    ])
+      .then(([categoriesRes, productsRes, subcategoriesRes]) => {
+        this.categories = [{ name: 'All', id: 'all-id' }, ...categoriesRes.data];
+        this.products = productsRes.data || [];
         this.filteredProducts = [...this.products];
-      },
-      error: (err) => console.error('Error fetching products', err),
-    });
+        this.subcategories = subcategoriesRes.data || [];
+      })
+      .catch((err) => {
+        console.error('Error loading data:', err);
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
   }
 
-  // Get all subcategories.
-  fetchAllSubcategories() {
-    this.SubCategoriesService.getAllSubcategories().subscribe({
-      next: (response) => {
-        this.subcategories = response.data || [];
-      },
-      error: (err) => console.error('Error fetching subcategories', err),
-    });
-  }
-
-  // Filter subcategories for a given category.
-  getSubcategoriesForCategory(categoryName: string) {
-    if (categoryName === 'All') {
-      return [];
-    }
-    return this.subcategories.filter(
-      (subcat) =>
-        subcat.category?.name.toLowerCase() === categoryName.toLowerCase()
-    );
-  }
-
-  // Return products for a subcategory with a limit.
-  getProductsForSubcategory(subcatName: string): any[] {
-    return this.filteredProducts
-      .filter((p) => p.subcategory?.name === subcatName)
-      .slice(0, this.visibleProductsCount);
-  }
-
-  // When a category is clicked, update filteredProducts and subcategories.
   filterCategory(category: any) {
     this.selectedCategory = category.name;
     this.selectedSubcategory = 'All';
@@ -96,31 +71,28 @@ export class HomeComponent implements OnInit {
       this.filteredProducts = [...this.products];
       this.fetchAllSubcategories();
     } else {
-      // Get products associated with this category.
-      this.CategoriesService.getCategoryProducts(category.id).subscribe({
-        next: (response) => {
-          this.filteredProducts = response.data.products || [];
-        },
-        error: (err) => console.error('Error fetching category products', err),
-      });
-      // Get subcategories for this category.
-      this.CategoriesService.getCategorySubcategories(category.id).subscribe({
-        next: (response) => {
-          this.subcategories = response.data || [];
-        },
-        error: (err) => {
+      this.isLoading = true;
+
+      Promise.all([
+        this.CategoriesService.getCategoryProducts(category.id).toPromise(),
+        this.CategoriesService.getCategorySubcategories(category.id).toPromise(),
+      ])
+        .then(([productsRes, subcategoriesRes]) => {
+          this.filteredProducts = productsRes.data.products || [];
+          this.subcategories = subcategoriesRes.data || [];
+        })
+        .catch((err) => {
           if (err.status === 404) {
-            console.error('Subcategories not found for this category.', err);
             this.subcategories = [];
-          } else {
-            console.error('Error fetching subcategories for category', err);
           }
-        },
-      });
+          console.error('Error filtering category', err);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     }
   }
 
-  // When a subcategory is clicked, update the filtered products.
   filterSubcategory(subcat: any) {
     this.selectedSubcategory = subcat.name;
     this.visibleProductsCount = 15;
@@ -128,27 +100,70 @@ export class HomeComponent implements OnInit {
     if (subcat.name === 'All') {
       this.filterCategory({ name: this.selectedCategory, id: 'all-id' });
     } else {
+      this.isLoading = true;
+
       this.SubCategoriesService.getSubcategoryProducts(subcat.id).subscribe({
         next: (response) => {
           this.filteredProducts = response.data.products || [];
+          this.isLoading = false;
         },
-        error: (err) =>
-          console.error('Error fetching subcategory products', err),
+        error: (err) => {
+          console.error('Error fetching subcategory products', err);
+          this.isLoading = false;
+        },
       });
     }
   }
 
-  // Load more products by increasing the count.
+  fetchAllSubcategories() {
+    this.SubCategoriesService.getAllSubcategories().subscribe({
+      next: (response) => {
+        this.subcategories = response.data || [];
+      },
+      error: (err) => console.error('Error fetching subcategories', err),
+    });
+  }
+
+  getSubcategoriesForCategory(categoryName: string) {
+    if (categoryName === 'All') return [];
+    return this.subcategories.filter(
+      (subcat) => subcat.category?.name.toLowerCase() === categoryName.toLowerCase()
+    );
+  }
+
+  getProductsForSubcategory(subcatName: string): any[] {
+    return this.filteredProducts
+      .filter((p) => p.subcategory?.name === subcatName)
+      .slice(0, this.visibleProductsCount);
+  }
+
   seeMore() {
     this.visibleProductsCount += 15;
   }
+
   trackByProductId(index: number, product: any) {
     return product.id;
   }
+
   getProductImageUrl(product: any): string {
     if (product.coverImage && !product.coverImage.startsWith('http')) {
       return `${this.globalService.apiUrl}/products/${product.coverImage}`;
     }
     return product.coverImage;
+  }
+
+  isProductInWishlist(product: any): boolean {
+    return this.wishlistService.isInWishlist(product);
+  }
+
+  toggleWishlistOrRedirect(product: any): void {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+
+    this.wishlistService.toggleWishlist(product);
   }
 }

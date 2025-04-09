@@ -25,7 +25,7 @@
         <ng-container *ngIf="user; else showSignIn">
           <div class="relative">
             <button (click)="toggleDropdown()" class="flex items-center focus:outline-none">
-              <svg class="w-6 h-6" viewBox="0 0 24 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg class="w-6 h-5" viewBox="0 0 24 33" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M11.9989 16.5002C16.4172 16.5002 19.9989 12.8065 19.9989 8.25008C19.9989 3.69369 16.4172 0 11.9989 0C7.58063 0 3.9989 3.69369 3.9989 8.25008C3.9989 12.8065 7.58063 16.5002 11.9989 16.5002Z"
                   fill="#033555" />
@@ -36,7 +36,8 @@
             </button>
             <div *ngIf="isDropdownOpen"
               class="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-48 bg-white text-fontColor shadow-lg rounded-md border border-primary transition-all duration-150 z-50">
-              <div class="absolute top-[-8px] left-1/2 transform -translate-x-1/2 w-2 h-2 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-primary">
+              <div
+                class="absolute top-[-8px] left-1/2 transform -translate-x-1/2 w-2 h-2 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-primary">
               </div>
               <!-- Dropdown Content -->
               <div class="bg-primary px-4 py-3 flex items-center gap-2 text-white">

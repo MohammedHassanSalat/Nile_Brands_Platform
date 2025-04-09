@@ -13,18 +13,18 @@ export class AuthService {
   }
 
   currentUser = new BehaviorSubject<any>(null);
-  private isRestored = new BehaviorSubject<boolean>(false); // Tracks restoration
+  private isRestored = new BehaviorSubject<boolean>(false);
 
   getLoggedUser(): Observable<any> {
     const url = `${this.globalService.apiUrl}/api/v1/users/me`;
     return this.http.get<any>(url, {
-      headers: { authorization: `Bearer ${localStorage.getItem('user')}` },
+      headers: { authorization: `Bearer ${localStorage.getItem('token')}` },
     });
   }
 
   restoreUser(): Promise<void> {
     return new Promise((resolve) => {
-      const token = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
       if (token) {
         this.getLoggedUser().subscribe({
           next: (res) => {
@@ -33,7 +33,7 @@ export class AuthService {
             resolve();
           },
           error: () => {
-            localStorage.removeItem('user');
+            localStorage.removeItem('token');
             this.currentUser.next(null);
             this.isRestored.next(true);
             resolve();
@@ -88,7 +88,7 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('user');
+    localStorage.removeItem('token');
     this.currentUser.next(null);
   }
 }
