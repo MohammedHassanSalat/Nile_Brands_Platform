@@ -16,16 +16,16 @@ import { WishlistService } from '../../services/wishlist/wishlist.service';
 })
 export class HomeComponent implements OnInit {
   home_page: string = 'images/images ui/home.png';
-  logo = 'images/images ui/nile brand.png';
+  logo: string = 'images/images ui/nile brand.png';
   products: any[] = [];
   categories: any[] = [];
   subcategories: any[] = [];
   selectedCategory: string = 'All';
   selectedSubcategory: string = 'All';
   filteredProducts: any[] = [];
-  visibleProductsCount = 15;
-
-  isLoading: boolean = true; 
+  visibleProductsCount: number = 15;
+  isLoading: boolean = true;
+  isLoggedIn: boolean = false;
 
   constructor(
     private productsService: ProductsService,
@@ -37,12 +37,17 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.checkLoginStatus();
     this.loadData();
+  }
+
+  checkLoginStatus(): void {
+    const token = localStorage.getItem('token');
+    this.isLoggedIn = !!token;
   }
 
   loadData() {
     this.isLoading = true;
-
     Promise.all([
       this.CategoriesService.getCategories().toPromise(),
       this.productsService.getProducts().toPromise(),
@@ -66,13 +71,11 @@ export class HomeComponent implements OnInit {
     this.selectedCategory = category.name;
     this.selectedSubcategory = 'All';
     this.visibleProductsCount = 15;
-
     if (category.name === 'All') {
       this.filteredProducts = [...this.products];
       this.fetchAllSubcategories();
     } else {
       this.isLoading = true;
-
       Promise.all([
         this.CategoriesService.getCategoryProducts(category.id).toPromise(),
         this.CategoriesService.getCategorySubcategories(category.id).toPromise(),
@@ -96,12 +99,10 @@ export class HomeComponent implements OnInit {
   filterSubcategory(subcat: any) {
     this.selectedSubcategory = subcat.name;
     this.visibleProductsCount = 15;
-
     if (subcat.name === 'All') {
       this.filterCategory({ name: this.selectedCategory, id: 'all-id' });
     } else {
       this.isLoading = true;
-
       this.SubCategoriesService.getSubcategoryProducts(subcat.id).subscribe({
         next: (response) => {
           this.filteredProducts = response.data.products || [];
@@ -131,6 +132,10 @@ export class HomeComponent implements OnInit {
     );
   }
 
+  getDisplayedProducts(): any[] {
+    return this.filteredProducts.slice(0, this.visibleProductsCount);
+  }
+
   getProductsForSubcategory(subcatName: string): any[] {
     return this.filteredProducts
       .filter((p) => p.subcategory?.name === subcatName)
@@ -158,12 +163,10 @@ export class HomeComponent implements OnInit {
 
   toggleWishlistOrRedirect(product: any): void {
     const token = localStorage.getItem('token');
-
     if (!token) {
       this.router.navigate(['/signin']);
       return;
     }
-
     this.wishlistService.toggleWishlist(product);
   }
 }
