@@ -27,7 +27,7 @@ export class WishlistComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('user');
     if (!token) {
       this.router.navigate(['/signin']);
       return;

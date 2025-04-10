@@ -14,17 +14,13 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterLink, ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  styleUrl: './login.component.css',
 })
 export class LoginComponent {
   constructor(private AuthService: AuthService, private Router: Router) { }
-
   loginForm = new FormGroup({
-    email: new FormControl<string | null>(null, [
-      Validators.required,
-      Validators.email,
-    ]),
-    password: new FormControl<string | null>(null, [Validators.required]),
+    email: new FormControl(null, [Validators.required, Validators.email]),
+    password: new FormControl(null, [Validators.required]),
   });
 
   invalidLoginMsg: string = '';
@@ -32,25 +28,18 @@ export class LoginComponent {
   login(formData: FormGroup) {
     if (formData.valid) {
       this.invalidLoginMsg = '';
-
-      const email = formData.value.email as string;
-      const password = formData.value.password as string;
-
-      this.AuthService.login({ email, password }).subscribe({
+      this.AuthService.login(formData.value).subscribe({
         next: (res) => {
           if (res.token) {
-            localStorage.setItem('token', res.token);
+            localStorage.setItem('user', res.token);
             this.AuthService.getLoggedUser().subscribe({
               next: (userRes) => {
                 const role = userRes.data?.role;
                 this.AuthService.currentUser.next(userRes.data);
-
                 if (role === 'user') {
                   this.Router.navigate(['/home']);
                 } else if (role === 'owner') {
                   this.Router.navigate(['/dashboard/hero']);
-                } else {
-                  this.Router.navigate(['/']);
                 }
               },
               error: (err) => {
@@ -61,8 +50,7 @@ export class LoginComponent {
           }
         },
         error: (err) => {
-          this.invalidLoginMsg =
-            err.error?.error?.message || 'Login failed.';
+          this.invalidLoginMsg =  err.error?.error?.message || 'Login failed.';
         },
       });
     }

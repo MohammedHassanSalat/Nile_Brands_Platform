@@ -25,15 +25,16 @@ export class WishlistService {
   }
 
   loadWishlist(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('user');
     this.loadingSubject.next(true);
     if (!token) {
       this.wishlistSubject.next([]);
       this.loadingSubject.next(false);
       return;
     }
-
-    this.http.get<{ data: WishlistProduct[] }>(this.wishlistUrl).subscribe({
+    this.http.get<{ data: WishlistProduct[] }>(this.wishlistUrl, {
+      headers: { authorization: `Bearer ${token}` }
+    }).subscribe({
       next: (res) => {
         this.wishlistSubject.next(res.data);
         this.loadingSubject.next(false);
@@ -55,20 +56,24 @@ export class WishlistService {
   }
 
   addToWishlist(product: WishlistProduct): Observable<any> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('user');
     if (!token) {
       this.router.navigate(['/signin'], { queryParams: { returnUrl: this.router.url } });
       return throwError(() => new Error('Not authenticated'));
     }
-
     const payload = { product: product.id || product._id };
-    return this.http.post<any>(this.wishlistUrl, payload).pipe(
+    return this.http.post<any>(this.wishlistUrl, payload, {
+      headers: { authorization: `Bearer ${token}` }
+    }).pipe(
       tap(() => this.loadWishlist())
     );
   }
 
   removeFromWishlist(productId: string): Observable<any> {
-    return this.http.delete<any>(`${this.wishlistUrl}/${productId}`).pipe(
+    const token = localStorage.getItem('user');
+    return this.http.delete<any>(`${this.wishlistUrl}/${productId}`, {
+      headers: { authorization: `Bearer ${token}` }
+    }).pipe(
       tap(() => this.loadWishlist())
     );
   }
