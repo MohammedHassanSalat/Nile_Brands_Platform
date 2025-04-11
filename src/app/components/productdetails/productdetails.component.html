@@ -1,107 +1,146 @@
-<div class="container min-h-screen mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center mt-8">
-  <!-- Product Images Section -->
-  <div class="flex flex-col items-center">
-    <div class="">
-      <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor mr-64">Details</h2>
-    </div>
-
-    <div class="relative max-w-[350px] h-[450px] flex items-center justify-center border rounded-lg shadow-md p-4 mt-2">
-      <img [src]="selectedImage" class="w-full h-full object-cover" alt="Product Image">
-      <div
-        class="absolute inset-0 top-5 left-[19rem] max-sm:left-[17rem] text-lg transition duration-300 cursor-pointer">
-        <svg class="w-6 h-6 transition-all duration-300" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path class="stroke-fontColor fill-transparent hover:fill-primary transition-all duration-300"
-            stroke-width="1" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81
-                  4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-        </svg>
-      </div>
-    </div>
-
-    <!-- Thumbnails -->
-    <div class="flex gap-3 mt-4">
-      <img *ngFor="let image of productImages; let i = index" [src]="image"
-        class="w-16 h-16 cursor-pointer border rounded-md p-1" [class.border-primary]="selectedImage === image"
-        (click)="selectedImage = image">
-    </div>
-  </div>
-
-  <!-- Product Details Section -->
-  <div class="flex flex-col gap-4 max-sm:ml-5">
-
-    <h2 class="text-[25px] sm:text-[30px] font-[500] text-fontColor">{{ product.title }}</h2>
-    <p class="text-[20px] sm:text-[25px] font-[500] text-fontColor">{{ product.description }}</p>
-
-    <!-- Ratings -->
-    <div class="flex flex-col gap-1">
-      <p class="text-[25px] sm:text-[30px] font-[500] text-fontColor">Reviews</p>
-      <div class="grid grid-cols-5 max-w-[40%] max-lg:max-w-[60%]">
-        <svg *ngFor="let star of stars; let i = index" [attr.fill]="(i + 1) <=  rating ? '#F5E426' : '#D9D9D9'"
-          width="35" height="32" viewBox="0 0 35 32" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M17.5 0L21.429 12.0922L34.1435 12.0922L23.8572 19.5656L27.7862 31.6578L17.5 24.1844L7.21376 31.6578L11.1428 19.5656L0.85651 12.0922L13.571 12.0922L17.5 0Z" />
-        </svg>
-      </div>
-    </div>
-
-    <!-- Size Selection -->
-    <div>
-      <p class="text-[25px] sm:text-[30px] font-[500] text-fontColor">Size</p>
-      <div class="flex gap-3 mt-2">
-        <button *ngFor="let size of product.sizes" (click)="selectedSize = size"
-          [class.bg-primary]="selectedSize === size" [class.text-white]="selectedSize === size"
-          class="px-4 py-2 border rounded-md hover:bg-primary hover:text-white">
-          {{ size }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Price -->
-    <p class="text-[25px] sm:text-[30px] font-[500] text-fontColor">Price: {{ product.price }} le</p>
-
-    <!-- Action Buttons -->
-    <div class="flex flex-col gap-4">
-      <button class="w-[50%] px-6 py-1 text-[16px] md:text-[20px] text-white bg-primary rounded-xl">Add to Cart</button>
-      <button
-        class="w-[50%] px-6 py-1 text-[16px] md:text-[20px] text-primary bg-white rounded-xl border-2 border-primary">Buy
-        Now</button>
-    </div>
-  </div>
-
-</div>
-
-<hr class="my-10">
-
-<div class="max-w-[1000px] mx-auto">
-  <!-- Comments Section -->
-  <div class="flex flex-col gap-4">
-    <div>
-      <input placeholder="Add Your Comment"
-        class="relative w-full px-4 py-2 text-[#03355582] border-none bg-[#D9D9D9] rounded-[19px]">
-    </div>
-    <div class="relative w-full h-full text-[#03355582] bg-[#D9D9D9] rounded-[19px] px-4 py-2">
-      <div class="absolute inset-0 top-3 left-4 w-[40px] h-[40px]">
-        <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
-      </div>
-      <p class="ml-16">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eos nihil nulla reprehenderit officiis
-        illum recusandae
-        suscipit voluptate cupiditate et quidem assumenda, hic doloremque aliquid, molestias fugiat excepturi nobis
-        fugit
-        itaque.
-      </p>
-    </div>
-    <div class="relative w-full h-full text-[#03355582] bg-[#D9D9D9] rounded-[19px] px-4 py-2">
-      <div class="absolute inset-0 top-3 left-4 w-[40px] h-[40px]">
-        <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
-      </div>
-      <p class="ml-16">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eos nihil nulla reprehenderit officiis
-        illum recusandae
-        suscipit voluptate cupiditate et quidem assumenda, hic doloremque aliquid, molestias fugiat excepturi nobis
-        fugit
-        itaque.
-      </p>
-    </div>
-
+<!-- Loading Spinner -->
+<div *ngIf="isLoading" class="flex items-center justify-center min-h-screen">
+  <div class="animate-spin">
+    <img [src]="logo" alt="Logo" class="w-40 h-40" />
   </div>
 </div>
 
-<hr class="my-10">
+<div *ngIf="!isLoading && !error" class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h2 class="text-4xl font-bold text-fontColor mb-8">Details</h2>
+
+    <div class="lg:grid lg:grid-cols-5 lg:gap-6">
+      <div class="lg:col-span-2">
+        <div class="aspect-square bg-gray-100 rounded-xl overflow-hidden relative group">
+          <img [src]="selectedImage" alt="Selected Product Image"
+            class="w-full h-full object-cover transition-opacity duration-300" />
+
+          <div
+            class="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button class="bg-white/90 p-2 rounded-full shadow-lg hover:bg-gray-100" (click)="previousImage()">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button class="bg-white/90 p-2 rounded-full shadow-lg hover:bg-gray-100" (click)="nextImage()">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          <button class="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg hover:bg-red-50 transition">
+            <svg class="w-8 h-8 text-gray-600 hover:text-red-500" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="mt-4 flex gap-2 overflow-x-auto p-1">
+          <img *ngFor="let img of productImages" [src]="img" alt="Product Thumbnail"
+            class="w-14 h-14 rounded-lg border cursor-pointer object-cover hover:scale-105 transition-transform"
+            [class.border-2]="selectedImage === img" [class.border-primary]="selectedImage === img"
+            (click)="selectedImage = img" />
+        </div>
+      </div>
+
+      <div class="lg:col-span-3 lg:pl-20 mt-6 lg:mt-0 space-y-6">
+        <div class="space-y-2">
+          <h1 class="text-3xl font-bold text-gray-900">{{ product.name }}</h1>
+          <p class="text-gray-600 text-lg leading-relaxed">{{ product.description }}</p>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-2">
+            <div class="flex text-amber-400">
+              <svg *ngFor="let star of stars; let i = index" class="w-5 h-5"
+                [attr.fill]="(i + 1) <= product.ratingAverage ? 'currentColor' : 'transparent'" stroke="currentColor"
+                stroke-width="1" viewBox="0 0 20 20">
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+            <span class="text-gray-500 text-sm">
+              {{ product.ratingAverage | number:'1.1-1' }} ({{ product.ratingCount }} reviews)
+            </span>
+          </div>
+
+          <div class="col-span-2">
+            <span class="text-2xl font-bold text-gray-900">{{ product.price }} LE</span>
+            <div class="mt-1">
+              <div class="flex items-center gap-2 text-gray-600 mr-1">
+                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-sm ">{{ product.quantity }} Available</span>
+                <div class="ml-56">
+                <span class="text-sm">{{ product.sold }} Sold</span>
+              </div>
+            </div>
+          </div>
+          </div>
+
+
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="col-span-2 flex gap-3">
+              <div class="flex-1">
+                <p class="text-gray-500 ">Brand</p>
+                <p class="font-medium text-gray-700">{{ product.brand.name }}</p>
+              </div>
+              <div class="flex-1">
+                <p class="text-gray-500">Owner</p>
+                <p class="font-medium text-gray-700">{{ product.brand.owner?.name || '-' }}</p>
+              </div>
+            </div>
+            <div class="col-span-2 flex gap-3">
+              <div class="flex-1">
+                <p class="text-gray-500">Category</p>
+                <p class="font-medium text-gray-700">{{ product.category.name }}</p>
+              </div>
+              <div class="flex-1">
+                <p class="text-gray-500">Subcategory</p>
+                <p class="font-medium text-gray-700">{{ product.subcategory.name }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-wrap gap-4">
+              <div *ngIf="product.sizes.length" class="flex-1">
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Sizes</h3>
+                <div class="flex flex-wrap gap-2">
+                  <button *ngFor="let size of product.sizes" (click)="selectedSize = size"
+                    [class.bg-gray-900]="selectedSize === size" [class.text-white]="selectedSize === size"
+                    class="px-3 py-1.5 text-sm border border-gray-200 rounded-md hover:bg-primary hover:text-white transition">
+                    {{ size }}
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="product.colors.length" class="flex-1">
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Colors</h3>
+                <div class="flex flex-wrap gap-2">
+                  <button *ngFor="let color of product.colors" [style.backgroundColor]="color"
+                    class="w-8 h-8 rounded-full border border-gray-200 hover:ring-1 hover:ring-gray-300 transition">
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sticky bottom-0 bg-gray-50/95 backdrop-blur-sm py-4 -mx-4 px-4 border-t border-gray-100">
+            <div class="flex flex-col gap-2 max-w-[450px] ml-1">
+              <button class="w-full py-2.5 bg-primary text-white rounded-lg font-medium  transition">
+                Add to Cart
+              </button>
+              <button
+                class="w-full py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition">
+                Buy Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

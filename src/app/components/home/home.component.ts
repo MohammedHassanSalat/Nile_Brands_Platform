@@ -41,7 +41,6 @@ export class HomeComponent implements OnInit {
     this.loadData();
   }
 
-  // Updated to use the 'user' key for login status
   checkLoginStatus(): void {
     const token = localStorage.getItem('user');
     this.isLoggedIn = !!token;
@@ -169,5 +168,8 @@ export class HomeComponent implements OnInit {
       return;
     }
     this.wishlistService.toggleWishlist(product);
+  }
+  viewDetails(product: any): void {
+    this.router.navigate(['/products', product.id]);
   }
 }

@@ -1,6 +1,7 @@
-import { Component, ElementRef, ViewChild, HostListener, OnInit } from '@angular/core';
+import {Component,ElementRef,ViewChild,HostListener,OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
@@ -11,16 +12,16 @@ import { AuthService } from '../../services/auth/auth.service';
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
-  profileImage: string = 'images/images ui/ProfileImg.png';
+  profileImage = 'images/images ui/ProfileImg.png';
   logo = 'images/images ui/nile brand.png';
-  hideNavbar: boolean = false;
+  hideNavbar = false;
   user: any = null;
-  isDropdownOpen: boolean = false;
-  authRestored: boolean = false;
+  isDropdownOpen = false;
+  authRestored = false;
 
   @ViewChild('navbar') navbar!: ElementRef;
-  private lastScrollTop: number = 0;
-  private hiddenRoutes: string[] = [
+  private lastScrollTop = 0;
+  private hiddenExact = [
     '/signin',
     '/resetpassword',
     '/forgetpassword',
@@ -35,21 +36,24 @@ export class NavbarComponent implements OnInit {
   ];
 
   constructor(private router: Router, private authService: AuthService) {
-    this.router.events.subscribe(() => {
-      this.hideNavbar = this.hiddenRoutes.includes(this.router.url);
-    });
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => {
+        const url = this.router.url;
+        const isExactHidden = this.hiddenExact.includes(url);
+        const isProductDetail = url.startsWith('/products/');
+        this.hideNavbar = isExactHidden || isProductDetail;
+      });
   }
 
   ngOnInit(): void {
-    this.authService.currentUser.subscribe((user: any) => {
-      this.user = user;
-    });
-    this.authService.isUserRestored().subscribe((restored: boolean) => {
-      this.authRestored = restored;
-    });
+    this.authService.currentUser.subscribe(user => (this.user = user));
+    this.authService
+      .isUserRestored()
+      .subscribe(restored => (this.authRestored = restored));
   }
 
-  @HostListener('window:scroll', [])
+  @HostListener('window:scroll')
   onWindowScroll(): void {
     if (this.hideNavbar || !this.navbar) return;
 

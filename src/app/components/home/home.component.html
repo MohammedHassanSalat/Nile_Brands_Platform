@@ -58,11 +58,12 @@
 
     <!-- Product Card Template -->
     <ng-template #productCard let-product>
-      <div class="w-full bg-gray-300 rounded-md shadow-lg p-3 relative">
+      <!-- Added (click)="viewDetails(product)" and cursor-pointer class -->
+      <div class="w-full bg-gray-300 rounded-md shadow-lg p-3 relative cursor-pointer" (click)="viewDetails(product)">
         <div class="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden rounded-md">
           <img [src]="getProductImageUrl(product)" alt="{{ product.name }}"
             class="w-full h-full object-cover rounded-md p-1" />
-          <button (click)="toggleWishlistOrRedirect(product)"
+          <button (click)="toggleWishlistOrRedirect(product); $event.stopPropagation()"
             [ngClass]="{'text-red-600': isLoggedIn && wishlistService.isInWishlist(product)}"
             class="absolute bottom-2 right-2 text-lg transition-all wishlist-button hover:bg-primary hover:text-red-600 rounded-full p-2 bg-white shadow-md">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 13 12" xmlns="http://www.w3.org/2000/svg">

@@ -22,11 +22,14 @@ import { authGuard } from './guards/auth.guard';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
+
   { path: 'register', component: SignupComponent },
   { path: 'forgetpassword', component: ForgetPasseordComponent },
   { path: 'resetpassword', component: ResetPasswordComponent },
   { path: 'verifyemail', component: VerifyemailComponent },
   { path: 'signin', component: LoginComponent },
+  
+
   {
     path: 'wishlist',
     component: WishlistComponent,
@@ -57,12 +60,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['user'] },
   },
+
+
   {
-    path: 'productdetails',
+    path: 'products/:id',
     component: ProductdetailsComponent,
-    canActivate: [authGuard],
-    data: { roles: ['user'] },
   },
+
   {
     path: 'createbrand',
     component: CreatebrandComponent,
@@ -81,4 +85,5 @@ export const routes: Routes = [
       { path: 'updatebrand', component: UpdatebrandComponent },
     ],
   },
+  { path: '**', redirectTo: 'home', pathMatch: 'full' },
 ];
