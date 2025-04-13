@@ -1,20 +1,16 @@
-<!-- Loading Spinner -->
 <div *ngIf="isLoading" class="flex items-center justify-center min-h-screen">
   <div class="animate-spin">
     <img [src]="logo" alt="Logo" class="w-40 h-40" />
   </div>
 </div>
-
-<div *ngIf="!isLoading && !error" class="min-h-screen bg-gray-50">
+<div *ngIf="!isLoading && !error" class="min-h-screen bg-gray-50 relative">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <h2 class="text-4xl font-bold text-fontColor mb-8">Details</h2>
-
     <div class="lg:grid lg:grid-cols-5 lg:gap-6">
       <div class="lg:col-span-2">
         <div class="aspect-square bg-gray-100 rounded-xl overflow-hidden relative group">
           <img [src]="selectedImage" alt="Selected Product Image"
             class="w-full h-full object-cover transition-opacity duration-300" />
-
           <div
             class="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
             <button class="bg-white/90 p-2 rounded-full shadow-lg hover:bg-gray-100" (click)="previousImage()">
@@ -28,7 +24,6 @@
               </svg>
             </button>
           </div>
-
           <button class="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg hover:bg-red-50 transition">
             <svg class="w-8 h-8 text-gray-600 hover:text-red-500" viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -36,21 +31,18 @@
             </svg>
           </button>
         </div>
-
-        <div class="mt-4 flex gap-2 overflow-x-auto p-1">
+        <div class="mt-4 flex gap-2 overflow-x-auto p-1 justify-center">
           <img *ngFor="let img of productImages" [src]="img" alt="Product Thumbnail"
             class="w-14 h-14 rounded-lg border cursor-pointer object-cover hover:scale-105 transition-transform"
             [class.border-2]="selectedImage === img" [class.border-primary]="selectedImage === img"
             (click)="selectedImage = img" />
         </div>
       </div>
-
       <div class="lg:col-span-3 lg:pl-20 mt-6 lg:mt-0 space-y-6">
         <div class="space-y-2">
           <h1 class="text-3xl font-bold text-gray-900">{{ product.name }}</h1>
           <p class="text-gray-600 text-lg leading-relaxed">{{ product.description }}</p>
         </div>
-
         <div class="flex flex-col gap-3">
           <div class="flex items-center gap-2">
             <div class="flex text-amber-400">
@@ -61,86 +53,238 @@
                   d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             </div>
-            <span class="text-gray-500 text-sm">
-              {{ product.ratingAverage | number:'1.1-1' }} ({{ product.ratingCount }} reviews)
-            </span>
+            <span class="text-gray-500 text-sm">{{ product.ratingAverage | number:'1.1-1' }} ({{ product.ratingCount }}
+              reviews)</span>
           </div>
-
-          <div class="col-span-2">
+          <div class="flex flex-wrap items-center gap-4">
             <span class="text-2xl font-bold text-gray-900">{{ product.price }} LE</span>
-            <div class="mt-1">
-              <div class="flex items-center gap-2 text-gray-600 mr-1">
-                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-6 text-sm">
+          <div>
+            <p class="text-gray-500">Category</p>
+            <p class="font-medium text-gray-700">{{ product.category.name }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Subcategory</p>
+            <p class="font-medium text-gray-700">{{ product.subcategory.name }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Owner</p>
+            <p class="font-medium text-gray-700">{{ product.brand.owner?.name || '-' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Brand</p>
+            <p class="font-medium text-gray-700">{{ product.brand.name }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <p class="text-gray-500">Quantity</p>
+            <ng-container *ngIf="product.quantity === 0; else available">
+              <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM16 13H8v-2h8v2z" />
+              </svg>
+              <span class="text-sm text-red-500">0</span>
+            </ng-container>
+            <ng-template #available>
+              <div class="flex items-center gap-1">
+                <svg class="w-4 h-4 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                <span class="text-sm ">{{ product.quantity }} Available</span>
-                <div class="ml-56">
-                <span class="text-sm">{{ product.sold }} Sold</span>
+                <span class="font-medium text-gray-700">{{ product.quantity }} Available</span>
+              </div>
+            </ng-template>
+          </div>
+          <div class="flex items-center gap-1">
+            <p class="text-gray-500">Sold</p>
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span class="font-medium text-gray-700">{{ product.sold }}</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-wrap gap-4">
+            <div *ngIf="product.sizes?.length" class="flex-1 min-w-[200px]">
+              <h3 class="text-lg font-medium text-gray-900 mb-2">Sizes</h3>
+              <div class="flex flex-wrap gap-2">
+                <button *ngFor="let size of product.sizes" (click)="selectedSize = size"
+                  [class.bg-gray-900]="selectedSize === size" [class.text-white]="selectedSize === size"
+                  class="px-3 py-1.5 text-sm border border-gray-200 rounded-md hover:bg-primary hover:text-white transition">
+                  {{ size }}
+                </button>
+              </div>
+            </div>
+            <div *ngIf="product.colors?.length" class="flex-1 min-w-[200px]">
+              <h3 class="text-lg font-medium text-gray-900 mb-2">Colors</h3>
+              <div class="flex flex-wrap gap-2">
+                <button *ngFor="let color of product.colors" [style.backgroundColor]="color"
+                  class="w-8 h-8 rounded-full border border-gray-200 hover:ring-1 hover:ring-gray-300 transition">
+                </button>
               </div>
             </div>
           </div>
+        </div>
+        <div class="sticky bottom-0 bg-gray-50/95 backdrop-blur-sm py-4 -mx-4 px-4 border-t border-gray-100">
+          <div class="flex flex-col gap-2">
+            <button class="w-full py-2.5 bg-primary text-white rounded-lg font-medium transition">
+              Add to Cart
+            </button>
+            <button
+              class="w-full py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition">
+              Buy Now
+            </button>
           </div>
-
-
-          <div class="grid grid-cols-2 gap-3 text-sm">
-            <div class="col-span-2 flex gap-3">
-              <div class="flex-1">
-                <p class="text-gray-500 ">Brand</p>
-                <p class="font-medium text-gray-700">{{ product.brand.name }}</p>
-              </div>
-              <div class="flex-1">
-                <p class="text-gray-500">Owner</p>
-                <p class="font-medium text-gray-700">{{ product.brand.owner?.name || '-' }}</p>
+        </div>
+      </div>
+    </div>
+    <hr class="my-6 border-gray-300" />
+    <div class="w-full">
+      <div class=" p-8 ">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h3>
+        <div *ngIf="isReviewOp" class="absolute inset-0 bg-white/75 flex items-center justify-center z-20">
+          <div class="animate-spin">
+            <img [src]="logo" alt="Logo" class="w-32 h-32" />
+          </div>
+        </div>
+        <div *ngIf="reviews?.length; else noReview" class="space-y-6">
+          <div *ngFor="let review of reviews" class="p-4 border rounded-lg bg-white shadow-sm">
+            <div class="flex gap-3 mb-2">
+              <img [src]="getUserPhoto(review.user)" alt="User avatar" class="w-10 h-10 rounded-full object-cover">
+              <div>
+                <p class="font-medium">{{ review.user?.name || 'Anonymous' }}</p>
+                <p class="text-sm text-gray-500">{{ review.createdAt | date }}</p>
               </div>
             </div>
-            <div class="col-span-2 flex gap-3">
-              <div class="flex-1">
-                <p class="text-gray-500">Category</p>
-                <p class="font-medium text-gray-700">{{ product.category.name }}</p>
-              </div>
-              <div class="flex-1">
-                <p class="text-gray-500">Subcategory</p>
-                <p class="font-medium text-gray-700">{{ product.subcategory.name }}</p>
-              </div>
+            <p class="text-gray-700 text-left mb-2">{{ review.comment }}</p>
+            <div class="flex text-amber-400">
+              <svg *ngFor="let s of [1,2,3,4,5]" class="w-5 h-5"
+                [attr.fill]="s <= review.rating ? 'currentColor' : 'transparent'" stroke="currentColor" stroke-width="1"
+                viewBox="0 0 20 20">
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
             </div>
-          </div>
-
-          <div class="flex flex-col gap-4">
-            <div class="flex flex-wrap gap-4">
-              <div *ngIf="product.sizes.length" class="flex-1">
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Sizes</h3>
-                <div class="flex flex-wrap gap-2">
-                  <button *ngFor="let size of product.sizes" (click)="selectedSize = size"
-                    [class.bg-gray-900]="selectedSize === size" [class.text-white]="selectedSize === size"
-                    class="px-3 py-1.5 text-sm border border-gray-200 rounded-md hover:bg-primary hover:text-white transition">
-                    {{ size }}
-                  </button>
+            <div *ngIf="(currentUser$ | async) as user" class="mt-2">
+              <ng-container *ngIf="user && review.user._id === user._id">
+                <div class="flex gap-2">
+                  <ng-container *ngIf="editReviewId !== review._id; else editButtons">
+                    <button (click)="startEdit(review)"
+                      class="px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-100">Update</button>
+                    <button (click)="deleteReview(review)"
+                      class="px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-red-100">Delete</button>
+                  </ng-container>
+                  <ng-template #editButtons>
+                    <button type="submit" [attr.form]="'editForm_' + review._id"
+                      class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90">Save</button>
+                    <button type="button" (click)="cancelEdit()"
+                      class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Cancel</button>
+                  </ng-template>
                 </div>
+              </ng-container>
+            </div>
+            <form *ngIf="editReviewId === review._id" (ngSubmit)="saveEdit(review)" [attr.id]="'editForm_' + review._id"
+              class="mt-4 space-y-2">
+              <textarea [(ngModel)]="editReviewModel.comment" name="editComment" rows="2" required
+                class="block w-full border-gray-300 rounded-md"></textarea>
+              <div class="flex text-amber-400">
+                <svg *ngFor="let s of [1,2,3,4,5]" class="w-8 h-8 cursor-pointer"
+                  [attr.fill]="s <= (editReviewModel.hoverRating || editReviewModel.rating) ? 'currentColor' : 'transparent'"
+                  stroke="currentColor" stroke-width="1" viewBox="0 0 20 20" (mouseenter)="setHoverRating(s, true)"
+                  (mouseleave)="resetHoverRating(true)" (click)="setRating(s, true)">
+                  <path
+                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
               </div>
-
-              <div *ngIf="product.colors.length" class="flex-1">
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Colors</h3>
-                <div class="flex flex-wrap gap-2">
-                  <button *ngFor="let color of product.colors" [style.backgroundColor]="color"
-                    class="w-8 h-8 rounded-full border border-gray-200 hover:ring-1 hover:ring-gray-300 transition">
-                  </button>
-                </div>
-              </div>
+            </form>
+          </div>
+        </div>
+        <ng-template #noReview>
+          <p class="text-gray-500 py-4">No reviews yet. Be the first to review this product!</p>
+        </ng-template>
+        <form #reviewForm="ngForm" (ngSubmit)="submitReview()" class="space-y-4 mt-8">
+          <div *ngIf="error" class="text-red-500">{{ error }}</div>
+          <div>
+            <label class="block text-gray-700">Comment</label>
+            <textarea name="comment" [(ngModel)]="newReview.comment" rows="3" required
+              class="mt-1 block w-full border-gray-300 rounded-md"></textarea>
+          </div>
+          <div>
+            <label class="block text-gray-700 mb-2">Rating</label>
+            <div class="flex text-amber-400">
+              <svg *ngFor="let s of [1,2,3,4,5]" class="w-8 h-8 cursor-pointer"
+                [attr.fill]="s <= (newReview.hoverRating || newReview.rating) ? 'currentColor' : 'transparent'"
+                stroke="currentColor" stroke-width="1" viewBox="0 0 20 20" (mouseenter)="setHoverRating(s)"
+                (mouseleave)="resetHoverRating()" (click)="setRating(s)">
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
             </div>
           </div>
-
-          <div class="sticky bottom-0 bg-gray-50/95 backdrop-blur-sm py-4 -mx-4 px-4 border-t border-gray-100">
-            <div class="flex flex-col gap-2 max-w-[450px] ml-1">
-              <button class="w-full py-2.5 bg-primary text-white rounded-lg font-medium  transition">
-                Add to Cart
-              </button>
-              <button
-                class="w-full py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition">
-                Buy Now
-              </button>
+          <button type="submit" [disabled]="isReviewOp"
+            class="w-full h-12 py-2.5 bg-primary text-white rounded-lg font-medium flex items-center justify-center">
+            <ng-container *ngIf="!isReviewOp">Submit Review</ng-container>
+            <ng-container *ngIf="isReviewOp">
+              <div class="flex flex-col items-center justify-center space-y-1.5">
+                <svg class="w-6 h-6 animate-spin" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
+                </svg>
+                <span class="text-sm">Sending…</span>
+              </div>
+            </ng-container>
+          </button>
+        </form>
+      </div>
+    </div>
+    <hr class="my-6 border-gray-300" />
+  </div>
+  <div class="-mt-5 w-full" *ngIf="relatedProducts.length > 0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6">
+        More in {{ product.category.name }}
+      </h3>
+      <div *ngIf="relatedLoading" class="flex justify-center py-8">
+        <div class="animate-spin">
+          <img [src]="logo" alt="Loading" class="w-12 h-12">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" *ngIf="!relatedLoading">
+        <div *ngFor="let relatedProduct of relatedProducts"
+          class="group bg-white rounded-xl shadow-md hover:shadow-lg border border-gray-200 p-4 flex flex-col transition-all duration-200 cursor-pointer"
+          (click)="viewDetails(relatedProduct)">
+          <div class="relative w-full pt-[100%] rounded-lg overflow-hidden">
+            <img [src]="relatedProduct.coverImage" alt="{{ relatedProduct.name }}"
+              class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+          </div>
+          <div class="mt-4 flex-grow space-y-2">
+            <h4 class="text-base font-semibold text-gray-900 line-clamp-2 leading-tight">
+              {{ relatedProduct.name }}
+            </h4>
+            <div class="flex items-center">
+              <div class="flex text-amber-400">
+                <ng-container *ngFor="let star of [1,2,3,4,5]">
+                  <svg [attr.fill]="star <= relatedProduct.ratingAverage ? 'currentColor' : 'none'"
+                    stroke="currentColor" stroke-width="1" viewBox="0 0 20 20" class="w-4 h-4">
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </ng-container>
+              </div>
+              <span class="text-sm text-gray-500 ml-1">({{ relatedProduct.ratingCount }})</span>
             </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <p class="text-lg font-bold text-primary">
+              {{ relatedProduct.price | currency:'EGP':'symbol':'1.0-0' }}
+            </p>
+            <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+              (click)="$event.stopPropagation()">
+              Add to Cart
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>

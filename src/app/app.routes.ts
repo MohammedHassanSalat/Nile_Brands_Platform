@@ -22,13 +22,11 @@ import { authGuard } from './guards/auth.guard';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
-
   { path: 'register', component: SignupComponent },
   { path: 'forgetpassword', component: ForgetPasseordComponent },
   { path: 'resetpassword', component: ResetPasswordComponent },
   { path: 'verifyemail', component: VerifyemailComponent },
   { path: 'signin', component: LoginComponent },
-  
 
   {
     path: 'wishlist',
@@ -60,13 +58,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['user'] },
   },
-
-
   {
     path: 'products/:id',
     component: ProductdetailsComponent,
   },
-
   {
     path: 'createbrand',
     component: CreatebrandComponent,

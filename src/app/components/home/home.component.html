@@ -1,14 +1,10 @@
-<!-- Loading Spinner -->
 <div *ngIf="isLoading" class="flex items-center justify-center min-h-screen">
   <div class="animate-spin">
     <img [src]="logo" alt="Logo" class="w-40 h-40" />
   </div>
 </div>
-
-<!-- Full Page Content -->
 <ng-container *ngIf="!isLoading">
   <div class="w-full pt-16 sm:pt-20">
-    <!-- Banner Section -->
     <section
       class="relative w-full h-[250px] sm:h-[300px] md:h-[400px] lg:h-[400px] flex flex-col justify-start pt-10 bg-gradient-to-b from-[#cde3db] to-[#f5d9a0] overflow-hidden">
       <img [src]="home_page" class="absolute inset-0 h-full w-full object-cover opacity-0 animate-zoom-in" />
@@ -26,8 +22,6 @@
         </h1>
       </div>
     </section>
-
-    <!-- Category / Subcategory Menu -->
     <div
       class="container mx-auto flex flex-wrap justify-center gap-4 pt-6 text-xs sm:text-sm md:text-base relative overflow-visible">
       <div *ngFor="let category of categories" class="relative group overflow-visible">
@@ -35,7 +29,6 @@
           [ngClass]="selectedCategory === category.name ? 'text-primary font-semibold' : 'text-fontColor font-normal hover:font-bold hover:scale-105'">
           {{ category.name | titlecase }}
         </a>
-        <!-- Dropdown for Subcategories -->
         <div *ngIf="getSubcategoriesForCategory(category.name).length"
           class="absolute left-0 mt-2 w-48 bg-white text-fontColor shadow-lg rounded-md border border-primary opacity-0 scale-50 pointer-events-none transform translate-y-2 transition-all duration-150 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:pointer-events-auto z-50 overflow-visible">
           <div
@@ -48,17 +41,12 @@
         </div>
       </div>
     </div>
-
-    <!-- Selected Category Title -->
     <div *ngIf="selectedCategory !== 'All'" class="container mx-auto mt-6 px-4">
       <h2 class="text-2xl text-center font-bold text-primary">
         {{ selectedCategory | titlecase }}
       </h2>
     </div>
-
-    <!-- Product Card Template -->
     <ng-template #productCard let-product>
-      <!-- Added (click)="viewDetails(product)" and cursor-pointer class -->
       <div class="w-full bg-gray-300 rounded-md shadow-lg p-3 relative cursor-pointer" (click)="viewDetails(product)">
         <div class="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden rounded-md">
           <img [src]="getProductImageUrl(product)" alt="{{ product.name }}"
@@ -88,8 +76,6 @@
         </div>
       </div>
     </ng-template>
-
-    <!-- "All" View -->
     <div *ngIf="selectedCategory === 'All'"
       class="mt-7 px-4 sm:px-20 lg:px-16 xl:px-20 2xl:px-24 max-w-[1400px] mx-auto">
       <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -104,11 +90,8 @@
         </button>
       </div>
     </div>
-
-    <!-- Specific Category View -->
     <div *ngIf="selectedCategory !== 'All'"
       class="mt-7 px-4 sm:px-20 lg:px-16 xl:px-20 2xl:px-24 max-w-[1400px] mx-auto">
-      <!-- Show All Subcategories -->
       <div *ngIf="selectedSubcategory === 'All'">
         <div *ngFor="let subcat of getSubcategoriesForCategory(selectedCategory)" class="mb-12">
           <h3 class="text-xl font-semibold text-fontColor mb-4">{{ subcat.name }}</h3>
@@ -118,7 +101,6 @@
             </ng-container>
           </div>
         </div>
-        <!-- Global See More Button for the Category when Subcategory is "All" -->
         <div class="flex justify-center my-10" *ngIf="visibleProductsCount < filteredProducts.length">
           <button (click)="seeMore()"
             class="px-4 py-2 bg-[#B7D6C6] text-fontColor text-lg font-bold rounded-lg hover:bg-primary hover:text-white transition-all">
@@ -126,7 +108,6 @@
           </button>
         </div>
       </div>
-      <!-- Show Selected Subcategory with Slicing -->
       <div *ngIf="selectedSubcategory !== 'All'">
         <h3 class="text-xl font-semibold text-fontColor mb-4">{{ selectedSubcategory }}</h3>
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
