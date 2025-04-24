@@ -46,11 +46,12 @@
         {{ selectedCategory | titlecase }}
       </h2>
     </div>
-    <ng-template #productCard let-product>
-      <div class="w-full bg-gray-300 rounded-md shadow-lg p-3 relative cursor-pointer" (click)="viewDetails(product)">
-        <div class="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden rounded-md">
-          <img [src]="getProductImageUrl(product)" alt="{{ product.name }}"
-            class="w-full h-full object-cover rounded-md p-1" />
+  <ng-template #productCard let-product>
+    <div class="w-full bg-gray-300 rounded-md shadow-lg p-3 relative cursor-pointer" (click)="viewDetails(product)">
+      <div class="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden rounded-md">
+        <img [src]="getProductImageUrl(product)" alt="{{ product.name }}"
+          class="w-full h-full object-cover rounded-md p-1" />
+        <div class="relative">
           <button (click)="toggleWishlistOrRedirect(product); $event.stopPropagation()"
             [ngClass]="{'text-red-600': isLoggedIn && wishlistService.isInWishlist(product)}"
             class="absolute bottom-2 right-2 text-lg transition-all wishlist-button hover:bg-primary hover:text-red-600 rounded-full p-2 bg-white shadow-md">
@@ -60,22 +61,26 @@
             </svg>
           </button>
         </div>
-        <div class="p-3">
-          <p class="font-bold text-lg text-fontColor break-words">
-            {{ product.name.length > 15 ? (product.name | slice:0:15) + '...' : product.name }}
-          </p>
-          <div class="flex justify-between items-center mt-2">
-            <p class="font-semibold text-fontColor text-lg">{{ product.price }} EGP</p>
-            <button class="bg-transparent text-fontColor text-lg">
-              <svg class="w-8 h-6 transition-all duration-300 hover:fill-primary" viewBox="0 0 19 21">
-                <path
-                  d="M11.5362 18.6862C11.5362 19.5984 12.1984 20.3448 13.0077 20.3448C13.8171 20.3448 14.4792 19.5984 14.4792 18.6862C14.4792 17.7739 13.8171 17.0275 13.0077 17.0275C12.1984 17.0275 11.5362 17.7739 11.5362 18.6862ZM5.65028 17.0275C6.4596 17.0275 7.12177 17.7739 7.12177 18.6862C7.12177 19.5984 6.4596 20.3448 5.65028 20.3448C4.84096 20.3448 4.17879 19.5984 4.17879 18.6862C4.17879 17.7739 4.84096 17.0275 5.65028 17.0275ZM6.38603 2.92928V4.5879H0.500065V2.92928H6.38603ZM3.31797 11.2224H14.1702L14.8618 4.5879H7.85752V2.92928H15.0384L15.0678 2.63902C15.2003 1.38676 16.142 0.441345 17.2603 0.441345H18.158V2.09997H17.2603C16.8851 2.09997 16.5761 2.4151 16.532 2.82976L15.3695 14.0006C15.237 15.2528 14.2953 16.1982 13.177 16.1982H3.4504V14.5396H13.1696C13.5448 14.5396 13.8538 14.2245 13.898 13.8098L13.9936 12.881H2.09663L1.16224 7.07583H2.6558L3.32533 11.2224H3.31797Z" />
-              </svg>
-            </button>
-          </div>
+      </div>
+      <div class="p-3">
+        <p class="font-bold text-lg text-fontColor break-words">
+          {{ product.name.length > 15 ? (product.name | slice:0:15) + '...' : product.name }}
+        </p>
+        <div class="flex justify-between items-center mt-2">
+          <p class="font-semibold text-fontColor text-lg">{{ product.price }} EGP</p>
+          <button (click)="toggleCartOrRedirect(product); $event.stopPropagation()"
+            [ngClass]="{'text-primary': isLoggedIn && cartService.isInCart(product.id)}"
+            class="bg-transparent text-fontColor text-lg transition-all duration-300 hover:text-primary">
+            <svg class="w-8 h-6" [class.fill-primary]="isLoggedIn && cartService.isInCart(product.id)"
+              viewBox="0 0 19 21">
+              <path
+                d="M11.5362 18.6862C11.5362 19.5984 12.1984 20.3448 13.0077 20.3448C13.8171 20.3448 14.4792 19.5984 14.4792 18.6862C14.4792 17.7739 13.8171 17.0275 13.0077 17.0275C12.1984 17.0275 11.5362 17.7739 11.5362 18.6862ZM5.65028 17.0275C6.4596 17.0275 7.12177 17.7739 7.12177 18.6862C7.12177 19.5984 6.4596 20.3448 5.65028 20.3448C4.84096 20.3448 4.17879 19.5984 4.17879 18.6862C4.17879 17.7739 4.84096 17.0275 5.65028 17.0275ZM6.38603 2.92928V4.5879H0.500065V2.92928H6.38603ZM3.31797 11.2224H14.1702L14.8618 4.5879H7.85752V2.92928H15.0384L15.0678 2.63902C15.2003 1.38676 16.142 0.441345 17.2603 0.441345H18.158V2.09997H17.2603C16.8851 2.09997 16.5761 2.4151 16.532 2.82976L15.3695 14.0006C15.237 15.2528 14.2953 16.1982 13.177 16.1982H3.4504V14.5396H13.1696C13.5448 14.5396 13.8538 14.2245 13.898 13.8098L13.9936 12.881H2.09663L1.16224 7.07583H2.6558L3.32533 11.2224H3.31797Z" />
+            </svg>
+          </button>
         </div>
       </div>
-    </ng-template>
+    </div>
+  </ng-template>
     <div *ngIf="selectedCategory === 'All'"
       class="mt-7 px-4 sm:px-20 lg:px-16 xl:px-20 2xl:px-24 max-w-[1400px] mx-auto">
       <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">

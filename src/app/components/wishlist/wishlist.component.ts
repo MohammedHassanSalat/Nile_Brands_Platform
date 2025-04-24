@@ -59,16 +59,14 @@ export class WishlistComponent implements OnInit {
     });
   }
 
-  onAddToCart(product: WishlistProduct): void {
-    this.cartService.addItem({
-      name: product.name,
-      description: product.description,
-      image: product.coverImage,
-      price: product.price,
-      quantity: 1
-    });
-    this.router.navigate(['/cart']);
-  }
+onAddToCart(product: WishlistProduct): void {
+  this.cartService.addToCart(product.id || product._id).subscribe({
+    next: () => {
+      this.router.navigate(['/cart']);
+    },
+    error: err => console.error('Error adding to cart', err)
+  });
+}
 
   onAddToWishlist(product: WishlistProduct): void {
     if (this.wishlistService.isInWishlist(product)) {

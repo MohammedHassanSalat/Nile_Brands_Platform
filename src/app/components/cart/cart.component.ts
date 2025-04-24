@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { CartItem, CartService } from '../../services/cart/cart.service';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { GlobalService } from '../../services/global/global.service';
+import { CartService } from '../../services/cart/cart.service';
+import { CartItem, Product } from '../../interfaces/CartItem';
 
 @Component({
   selector: 'app-cart',
@@ -12,67 +13,127 @@ import { Subscription } from 'rxjs';
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
-export class CartComponent implements OnInit, OnDestroy {
-  pay_1: string = 'images/images ui/pay 1.png';
-  pay_2: string = 'images/images ui/pay 2.png';
-  pay_3: string = 'images/images ui/pay 3.png';
-  pay_4: string = 'images/images ui/pay 4.png';
+export class CartComponent implements OnInit {
+  pay_1 = 'images/images ui/pay 1.png';
+  pay_2 = 'images/images ui/pay 2.png';
+
+  loading = true;
   cartItems: CartItem[] = [];
-  private subscription!: Subscription;
-  constructor(private cartService: CartService) {}
+  couponCode = '';
+  shippingCost = 0;
+  discountAmount = 0;
+  isUpdatingQuantity = false;
+  quantityError = '';
+  itemError = '';
+  private errorTimeout: any;
+
+  paymentInfo = {
+    email: '',
+    cardNumber: '',
+    expiry: '',
+    cvc: '',
+    cardholderName: '',
+    country: 'Egypt',
+    zip: ''
+  };
+
+  constructor(
+    private router: Router,
+    public cartService: CartService,
+    private globalService: GlobalService
+  ) { }
 
   ngOnInit(): void {
-    this.subscription = this.cartService.cartItems$.subscribe(items => {
-      this.cartItems = items;
+    const token = localStorage.getItem('user');
+    if (!token) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+    this.cartService.cart$.subscribe(items => this.cartItems = items);
+    this.cartService.loading$.subscribe(flag => this.loading = flag);
+    this.cartService.loadCart();
+  }
+
+  getProduct(item: CartItem): Product | null {
+    return typeof item.product === 'object' ? item.product : null;
+  }
+
+  getImageUrl(image: string): string {
+    return image.startsWith('http') ? image : `${this.globalService.apiUrl}/products/${image}`;
+  }
+
+  removeItem(itemId: string): void {
+    this.loading = true;
+    this.cartService.removeItem(itemId).subscribe({
+      error: () => this.loading = false
     });
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
-
-  removeItem(index: number): void {
-    this.cartService.removeItem(index);
-  }
-
   removeAll(): void {
-    // Clear the cart by emitting an empty array.
-    this.cartService.clearCart();
+    if (confirm('Clear cart?')) {
+      this.cartService.clearCart().subscribe();
+    }
   }
 
-  // Compute subtotal from cart items.
-  getSubtotal(): number {
-    return this.cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  }
+  updateQuantity(item: CartItem): void {
+    clearTimeout(this.errorTimeout);
+    const original = item.quantity;
+    this.isUpdatingQuantity = true;
+    this.itemError = item._id;
 
-  // Total: Subtotal minus Savings plus Store Pickup fee plus Tax.
-  getTotal(): number {
-    return this.getSubtotal();
-  }
-
-  /**
-   * Called when the user clicks the "Pay" button.
-   */
-  onCheckout(): void {
-    const total = this.getTotal();
-    alert(`Thank you for your purchase of ${total.toFixed(2)} LE!`);
-    // Optionally clear the cart or form here.
-  }
-
-  decrementQuantity(item: CartItem): void {
-    item.quantity = Math.max(item.quantity - 1, 1);
-    // Re-emit the updated cart to trigger UI changes.
-    this.cartService.updateCartItems();
+    this.cartService.updateQuantity(item._id, item.quantity).subscribe({
+      next: () => {
+        this.isUpdatingQuantity = false;
+        this.quantityError = '';
+      },
+      error: (err) => {
+        item.quantity = original;
+        this.isUpdatingQuantity = false;
+        this.quantityError = err.error?.error?.message || 'Failed to update quantity';
+        this.errorTimeout = setTimeout(() => this.quantityError = '', 5000);
+      }
+    });
   }
 
   incrementQuantity(item: CartItem): void {
     item.quantity++;
-    // Re-emit the updated cart.
-    this.cartService.updateCartItems();
+    this.updateQuantity(item);
   }
 
-  clearCheckoutForm(): void {
-    console.log('Checkout form cleared!');
-    // Reset form fields if necessary.
+  decrementQuantity(item: CartItem): void {
+    if (item.quantity <= 1) return;
+    item.quantity--;
+    this.updateQuantity(item);
+  }
+
+  getSubtotal(): number {
+    return this.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  }
+
+  getTotal(): number {
+    return this.getSubtotal() + this.shippingCost - this.discountAmount;
+  }
+
+  applyCoupon(): void {
+    this.discountAmount = this.getSubtotal() * 0.1;
+  }
+
+  onCheckout(): void {
+    if (this.validatePayment()) {
+      this.router.navigate(['/cart'], {
+        state: {
+          paymentInfo: this.paymentInfo,
+          totalAmount: this.getTotal()
+        }
+      });
+    }
+  }
+
+  private validatePayment(): boolean {
+    const e = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.paymentInfo.email);
+    const c = this.paymentInfo.cardNumber.replace(/\s/g, '').length === 16;
+    const x = /^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(this.paymentInfo.expiry);
+    const v = /^\d{3,4}$/.test(this.paymentInfo.cvc);
+    return e && c && x && v && !!this.paymentInfo.cardholderName && !!this.paymentInfo.zip;
   }
 }

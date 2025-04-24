@@ -6,6 +6,7 @@ import { GlobalService } from '../../services/global/global.service';
 import { CategoriesService } from '../../services/categories/categories.service';
 import { SubCategoriesService } from '../../services/subCategories/sub-categories.service';
 import { WishlistService } from '../../services/wishlist/wishlist.service';
+import { CartService } from '../../services/cart/cart.service';
 
 @Component({
   selector: 'app-home',
@@ -14,18 +15,19 @@ import { WishlistService } from '../../services/wishlist/wishlist.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
+  
 export class HomeComponent implements OnInit {
-  home_page: string = 'images/images ui/home.png';
-  logo: string = 'images/images ui/nile brand.png';
+  home_page = 'images/images ui/home.png';
+  logo = 'images/images ui/nile brand.png';
   products: any[] = [];
   categories: any[] = [];
   subcategories: any[] = [];
-  selectedCategory: string = 'All';
-  selectedSubcategory: string = 'All';
+  selectedCategory = 'All';
+  selectedSubcategory = 'All';
   filteredProducts: any[] = [];
-  visibleProductsCount: number = 15;
-  isLoading: boolean = true;
-  isLoggedIn: boolean = false;
+  visibleProductsCount = 15;
+  isLoading = true;
+  isLoggedIn = false;
 
   constructor(
     private productsService: ProductsService,
@@ -33,7 +35,8 @@ export class HomeComponent implements OnInit {
     private globalService: GlobalService,
     private CategoriesService: CategoriesService,
     private SubCategoriesService: SubCategoriesService,
-    public wishlistService: WishlistService
+    public wishlistService: WishlistService,
+    public cartService: CartService
   ) { }
 
   ngOnInit() {
@@ -85,9 +88,7 @@ export class HomeComponent implements OnInit {
           this.subcategories = subcategoriesRes.data || [];
         })
         .catch((err) => {
-          if (err.status === 404) {
-            this.subcategories = [];
-          }
+          if (err.status === 404) this.subcategories = [];
           console.error('Error filtering category', err);
         })
         .finally(() => {
@@ -157,10 +158,6 @@ export class HomeComponent implements OnInit {
     return product.coverImage;
   }
 
-  isProductInWishlist(product: any): boolean {
-    return this.wishlistService.isInWishlist(product);
-  }
-
   toggleWishlistOrRedirect(product: any): void {
     const token = localStorage.getItem('user');
     if (!token) {
@@ -169,6 +166,20 @@ export class HomeComponent implements OnInit {
     }
     this.wishlistService.toggleWishlist(product);
   }
+
+  toggleCartOrRedirect(product: any): void {
+    const token = localStorage.getItem('user');
+    if (!token) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+    if (this.cartService.isInCart(product.id)) {
+      this.cartService.removeItem(product.id).subscribe();
+    } else {
+      this.cartService.addToCart(product.id).subscribe();
+    }
+  }
+
   viewDetails(product: any): void {
     this.router.navigate(['/products', product.id]);
   }
