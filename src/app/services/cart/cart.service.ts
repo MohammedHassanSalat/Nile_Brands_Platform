@@ -3,13 +3,27 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, forkJoin, of } from 'rxjs';
 import { tap, catchError, map, mergeMap, timeout, switchMap } from 'rxjs/operators';
 import { GlobalService } from '../global/global.service';
-import { CartItem, Product } from '../../interfaces/CartItem';
+import { CartItem } from '../../interfaces/CartItem';
 import { Router } from '@angular/router';
+
+export interface CartState {
+  items: CartItem[];
+  couponCode?: string;
+  discountAmount: number;
+  totalPrice: number;
+  totalPriceAfterDiscount: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
   private apiUrl: string;
-  private cartSubject = new BehaviorSubject<CartItem[]>([]);
+  private cartSubject = new BehaviorSubject<CartState>({
+    items: [],
+    couponCode: undefined,
+    discountAmount: 0,
+    totalPrice: 0,
+    totalPriceAfterDiscount: 0
+  });
   public cart$ = this.cartSubject.asObservable();
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
@@ -25,27 +39,51 @@ export class CartService {
   loadCart(): void {
     const token = localStorage.getItem('user');
     this.loadingSubject.next(true);
-
     if (!token) {
-      this.handleAuthError();
+      this.cartSubject.next({ items: [], discountAmount: 0, totalPrice: 0, totalPriceAfterDiscount: 0 });
+      this.loadingSubject.next(false);
+      this.router.navigate(['/home']);
       return;
     }
-
-    this.http.get<{ data: { cartItems: CartItem[] } }>(`${this.apiUrl}/api/v1/carts`, {
-      headers: { authorization: `Bearer ${token}` }
-    }).pipe(
-      timeout(15000),
-      map(response => response.data.cartItems),
-      mergeMap(items => this.processCartItems(items)),
-      catchError(error => this.handleLoadError(error))
-    ).subscribe({
-      next: items => this.handleLoadSuccess(items),
-      error: () => this.handleLoadError()
-    });
+    this.http
+      .get<{
+        data: {
+          cartItems: CartItem[];
+          coupon?: { code: string };
+          totalPrice: number;
+          totalPriceAfterDiscount: number;
+        };
+      }>(`${this.apiUrl}/api/v1/carts`, {
+        headers: { authorization: `Bearer ${token}` }
+      })
+      .pipe(
+        timeout(15000),
+        map(response => ({
+          items: response.data.cartItems,
+          couponCode: response.data.coupon?.code,
+          discountAmount: response.data.totalPrice - response.data.totalPriceAfterDiscount,
+          totalPrice: response.data.totalPrice,
+          totalPriceAfterDiscount: response.data.totalPriceAfterDiscount
+        })),
+        mergeMap(state =>
+          state.items.length
+            ? this.processCartItems(state).pipe(map(processed => ({ ...state, items: processed })))
+            : of(state)
+        ),
+        catchError(error => {
+          this.cartSubject.next({ items: [], discountAmount: 0, totalPrice: 0, totalPriceAfterDiscount: 0 });
+          this.loadingSubject.next(false);
+          return throwError(() => error);
+        })
+      )
+      .subscribe(state => {
+        this.cartSubject.next(state);
+        this.loadingSubject.next(false);
+      });
   }
 
-  private processCartItems(items: CartItem[]): Observable<CartItem[]> {
-    const requests = items.map(item =>
+  private processCartItems(state: CartState): Observable<CartItem[]> {
+    const requests = state.items.map(item =>
       typeof item.product === 'string'
         ? this.fetchProductDetails(item)
         : of(item)
@@ -54,135 +92,115 @@ export class CartService {
   }
 
   private fetchProductDetails(item: CartItem): Observable<CartItem> {
-    return this.http.get<{ data: any }>(
-      `${this.apiUrl}/products/${item.product}`
-    ).pipe(
-      timeout(10000),
-      map(resp => ({
-        ...item,
-        product: {
-          ...resp.data,
-          description: resp.data.description || 'No description',
-          category: resp.data.category || { name: 'Uncategorized' },
-          availableQuantity: resp.data.availableQuantity ?? 0
-        }
-      }))
-    );
-  }
-
-  private handleLoadSuccess(items: CartItem[]): void {
-    this.cartSubject.next(items);
-    this.loadingSubject.next(false);
-  }
-
-  private handleLoadError(error?: any): Observable<never> {
-    this.cartSubject.next([]);
-    this.loadingSubject.next(false);
-    return throwError(() => error || new Error('Cart load failed'));
-  }
-
-  private handleAuthError(): void {
-    this.cartSubject.next([]);
-    this.loadingSubject.next(false);
-    this.router.navigate(['/home']);
+    return this.http
+      .get<{ data: any }>(`${this.apiUrl}/products/${item.product}`)
+      .pipe(
+        timeout(10000),
+        map(resp => ({
+          ...item,
+          product: {
+            ...resp.data,
+            description: resp.data.description || 'No description',
+            category: resp.data.category || { name: 'Uncategorized' },
+            availableQuantity: resp.data.availableQuantity ?? 0
+          }
+        }))
+      );
   }
 
   addToCart(productId: string, quantity: number = 1): Observable<any> {
     const token = localStorage.getItem('user');
     if (!token) {
-      this.handleAuthError();
+      this.cartSubject.next({ items: [], discountAmount: 0, totalPrice: 0, totalPriceAfterDiscount: 0 });
+      this.loadingSubject.next(false);
+      this.router.navigate(['/home']);
       return throwError(() => new Error('Not authenticated'));
     }
-    return this.http.post(`${this.apiUrl}/api/v1/carts`, { product: productId, quantity }, {
-      headers: { authorization: `Bearer ${token}` }
-    }).pipe(
-      tap(() => this.loadCart()),
-      catchError(error => this.handleOperationError(error))
-    );
+    return this.http
+      .post(`${this.apiUrl}/api/v1/carts`, { product: productId, quantity }, { headers: { authorization: `Bearer ${token}` } })
+      .pipe(
+        tap(() => this.loadCart()),
+        catchError(err => throwError(() => err))
+      );
   }
 
   updateQuantity(itemId: string, quantity: number): Observable<any> {
     const token = localStorage.getItem('user');
     if (!token) {
-      this.handleAuthError();
+      this.router.navigate(['/home']);
       return throwError(() => new Error('Not authenticated'));
     }
-    return this.http.put(`${this.apiUrl}/api/v1/carts/${itemId}`, { quantity }, {
-      headers: { authorization: `Bearer ${token}` }
-    }).pipe(
-      tap(() => this.loadCart()),
-      catchError(error => this.handleOperationError(error))
-    );
+    return this.http
+      .put(`${this.apiUrl}/api/v1/carts/${itemId}`, { quantity }, { headers: { authorization: `Bearer ${token}` } })
+      .pipe(
+        tap(() => this.loadCart()),
+        catchError(err => throwError(() => err))
+      );
   }
 
   removeItem(itemId: string): Observable<any> {
     const token = localStorage.getItem('user');
     if (!token) {
-      this.handleAuthError();
+      this.router.navigate(['/home']);
       return throwError(() => new Error('Not authenticated'));
     }
-
-    const currentItems = this.cartSubject.getValue();
-    const isLastItem = currentItems.length === 1 && currentItems[0]._id === itemId;
-
-    this.loadingSubject.next(true);
-
-    return this.http.delete(`${this.apiUrl}/api/v1/carts/${itemId}`, {
-      headers: { authorization: `Bearer ${token}` }
-    }).pipe(
-      switchMap(() => {
-        if (isLastItem) {
-          this.cartSubject.next([]);
-          this.loadingSubject.next(false);
-          return of(null);
-        } else {
-          this.loadCart();
-          return of(null);
-        }
-      }),
-      catchError(error => this.handleOperationError(error))
-    );
+    return this.http
+      .delete(`${this.apiUrl}/api/v1/carts/${itemId}`, { headers: { authorization: `Bearer ${token}` } })
+      .pipe(
+        tap(() => this.loadCart()),
+        catchError(err => throwError(() => err))
+      );
   }
 
   clearCart(): Observable<any> {
     const token = localStorage.getItem('user');
     if (!token) {
-      this.handleAuthError();
+      this.router.navigate(['/home']);
       return throwError(() => new Error('Not authenticated'));
     }
-    return this.http.delete(`${this.apiUrl}/api/v1/carts`, {
-      headers: { authorization: `Bearer ${token}` }
-    }).pipe(
-      tap(() => this.cartSubject.next([])),
-      catchError(error => this.handleOperationError(error))
-    );
+    return this.http
+      .delete(`${this.apiUrl}/api/v1/carts`, { headers: { authorization: `Bearer ${token}` } })
+      .pipe(
+        tap(() => {
+          this.cartSubject.next({ items: [], discountAmount: 0, totalPrice: 0, totalPriceAfterDiscount: 0 });
+        }),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  private handleOperationError(error: any): Observable<never> {
-    this.loadingSubject.next(false);
-    return throwError(() => error);
+  applyCoupon(code: string): Observable<any> {
+    const token = localStorage.getItem('user');
+    if (!token) {
+      this.router.navigate(['/home']);
+      return throwError(() => new Error('Not authenticated'));
+    }
+    return this.http
+      .put<{
+        data: {
+          cartItems: CartItem[];
+          coupon?: { code: string };
+          totalPrice: number;
+          totalPriceAfterDiscount: number;
+        };
+      }>(`${this.apiUrl}/api/v1/carts/applyCoupon`, { name: code }, { headers: { authorization: `Bearer ${token}` } })
+      .pipe(
+        map(response => ({
+          items: response.data.cartItems,
+          couponCode: response.data.coupon?.code,
+          discountAmount: response.data.totalPrice - response.data.totalPriceAfterDiscount,
+          totalPrice: response.data.totalPrice,
+          totalPriceAfterDiscount: response.data.totalPriceAfterDiscount
+        })),
+        tap(state => this.cartSubject.next(state)),
+        catchError(err => throwError(() => err))
+      );
   }
 
   isInCart(productId: string): boolean {
-    return this.cartSubject.getValue().some(item =>
+    return this.cartSubject.getValue().items.some(item =>
       typeof item.product === 'string'
         ? item.product === productId
         : item.product._id === productId
-    );
-  }
-
-  applyCoupon(couponCode: string): Observable<any> {
-    const token = localStorage.getItem('user');
-    if (!token) {
-      this.handleAuthError();
-      return throwError(() => new Error('Not authenticated'));
-    }
-    return this.http.put(
-      `${this.apiUrl}/api/v1/carts/applyCoupon`,
-      { name: couponCode },
-      { headers: { authorization: `Bearer ${token}` } }
-    ).pipe(
-      catchError(err => this.handleOperationError(err))
     );
   }
 }

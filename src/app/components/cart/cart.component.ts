@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { GlobalService } from '../../services/global/global.service';
-import { CartService } from '../../services/cart/cart.service';
+import { CartService, CartState } from '../../services/cart/cart.service';
 import { CartItem, Product } from '../../interfaces/CartItem';
 
 @Component({
@@ -11,12 +11,12 @@ import { CartItem, Product } from '../../interfaces/CartItem';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css']
+  styleUrls: ['./cart.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CartComponent implements OnInit {
   pay_1 = 'images/images ui/pay 1.png';
   pay_2 = 'images/images ui/pay 2.png';
-
   loading = true;
   cartItems: CartItem[] = [];
   couponCode = '';
@@ -28,7 +28,6 @@ export class CartComponent implements OnInit {
   quantityError = '';
   itemError = '';
   private errorTimeout: any;
-
   paymentInfo = {
     email: '',
     cardNumber: '',
@@ -42,7 +41,8 @@ export class CartComponent implements OnInit {
   constructor(
     private router: Router,
     public cartService: CartService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -51,9 +51,18 @@ export class CartComponent implements OnInit {
       this.router.navigate(['/signin']);
       return;
     }
-    this.cartService.cart$.subscribe(items => this.cartItems = items);
-    this.cartService.loading$.subscribe(flag => this.loading = flag);
+    this.cartService.cart$.subscribe((state: CartState) => {
+      if (this.loading) this.loading = false;
+      this.cartItems = state.items;
+      this.couponCode = state.couponCode || '';
+      this.discountAmount = state.discountAmount || 0;
+      this.cdr.markForCheck();
+    });
     this.cartService.loadCart();
+  }
+
+  trackById(index: number, item: CartItem): string {
+    return item._id;
   }
 
   getProduct(item: CartItem): Product | null {
@@ -61,14 +70,13 @@ export class CartComponent implements OnInit {
   }
 
   getImageUrl(image: string): string {
-    return image.startsWith('http') ? image : `${this.globalService.apiUrl}/products/${image}`;
+    return image.startsWith('http')
+      ? image
+      : `${this.globalService.apiUrl}/products/${image}`;
   }
 
   removeItem(itemId: string): void {
-    this.loading = true;
-    this.cartService.removeItem(itemId).subscribe({
-      error: () => this.loading = false
-    });
+    this.cartService.removeItem(itemId).subscribe();
   }
 
   removeAll(): void {
@@ -79,59 +87,82 @@ export class CartComponent implements OnInit {
 
   updateQuantity(item: CartItem): void {
     clearTimeout(this.errorTimeout);
-    const original = item.quantity;
+    const originalQuantity = item.quantity;
     this.isUpdatingQuantity = true;
     this.itemError = item._id;
-
+    this.couponApplied = false;
+    this.couponError = '';
+    this.discountAmount = 0;
+    this.cdr.markForCheck();
     this.cartService.updateQuantity(item._id, item.quantity).subscribe({
       next: () => {
         this.isUpdatingQuantity = false;
         this.quantityError = '';
+        this.cdr.markForCheck();
       },
-      error: (err) => {
-        item.quantity = original;
+      error: err => {
+        item.quantity = originalQuantity;
         this.isUpdatingQuantity = false;
         this.quantityError = err.error?.error?.message || 'Failed to update quantity';
-        this.errorTimeout = setTimeout(() => this.quantityError = '', 5000);
+        this.errorTimeout = setTimeout(() => {
+          this.quantityError = '';
+          this.cdr.markForCheck();
+        }, 5000);
+        this.cdr.markForCheck();
       }
     });
   }
 
   incrementQuantity(item: CartItem): void {
+    const original = item.quantity;
     item.quantity++;
-    this.updateQuantity(item);
+    this.cdr.markForCheck();
+    this.cartService.updateQuantity(item._id, item.quantity).subscribe({
+      next: () => { },
+      error: err => {
+        item.quantity = original;
+        this.quantityError = err.error?.error?.message || 'Failed to update quantity';
+        this.cdr.markForCheck();
+        setTimeout(() => {
+          this.quantityError = '';
+          this.cdr.markForCheck();
+        }, 5000);
+      }
+    });
   }
 
   decrementQuantity(item: CartItem): void {
     if (item.quantity <= 1) return;
+    const original = item.quantity;
     item.quantity--;
-    this.updateQuantity(item);
+    this.cdr.markForCheck();
+    this.cartService.updateQuantity(item._id, item.quantity).subscribe({
+      next: () => { },
+      error: err => {
+        item.quantity = original;
+        this.quantityError = err.error?.error?.message || 'Failed to update quantity';
+        this.cdr.markForCheck();
+        setTimeout(() => {
+          this.quantityError = '';
+          this.cdr.markForCheck();
+        }, 5000);
+      }
+    });
   }
 
   applyCoupon(): void {
     this.couponError = '';
     this.couponApplied = false;
-
-    if (!this.couponCode) {
-      this.couponError = 'Please enter a coupon code';
-      return;
-    }
-
     this.cartService.applyCoupon(this.couponCode).subscribe({
-      next: (res: any) => {
+      next: () => {
         this.couponApplied = true;
-        this.couponError = '';
-        this.discountAmount = res.data.totalPrice - res.data.totalPriceAfterDiscount;
-        this.cartService.loadCart();
+        this.cdr.markForCheck();
       },
-      error: (err) => {
+      error: err => {
         this.couponApplied = false;
         this.discountAmount = 0;
-        if (err.error?.error?.message) {
-          this.couponError = err.error.error.message;
-        } else {
-          this.couponError = 'Failed to apply coupon';
-        }
+        this.couponError = err.error?.error?.message || 'Failed to apply coupon';
+        this.cdr.markForCheck();
       }
     });
   }

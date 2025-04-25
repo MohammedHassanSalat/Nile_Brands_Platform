@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth/auth.service';
-import { CartService } from '../../services/cart/cart.service';
+import { CartService, CartState } from '../../services/cart/cart.service';
+import { CartItem } from '../../interfaces/CartItem';
 
 @Component({
   selector: 'app-navbar',
@@ -55,8 +56,8 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser.subscribe(user => this.user = user);
     this.authService.isUserRestored().subscribe(restored => this.authRestored = restored);
-    this.cartService.cart$.subscribe(items => {
-      this.cartCount = items.reduce((sum, i) => sum + i.quantity, 0);
+    this.cartService.cart$.subscribe((state: CartState) => {
+      this.cartCount = state.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0);
     });
   }
 
