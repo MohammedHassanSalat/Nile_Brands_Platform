@@ -84,7 +84,7 @@ export class CartService {
   private handleAuthError(): void {
     this.cartSubject.next([]);
     this.loadingSubject.next(false);
-    this.router.navigate(['/signin']);
+    this.router.navigate(['/home']);
   }
 
   addToCart(productId: string, quantity: number = 1): Observable<any> {

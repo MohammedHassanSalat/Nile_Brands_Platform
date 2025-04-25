@@ -15,7 +15,6 @@ import { CartService } from '../../services/cart/cart.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-  
 export class HomeComponent implements OnInit {
   home_page = 'images/images ui/home.png';
   logo = 'images/images ui/nile brand.png';
@@ -40,6 +39,8 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.cartService.loadCart();
+    this.wishlistService.loadWishlist();
     this.checkLoginStatus();
     this.loadData();
   }
@@ -62,12 +63,8 @@ export class HomeComponent implements OnInit {
         this.filteredProducts = [...this.products];
         this.subcategories = subcategoriesRes.data || [];
       })
-      .catch((err) => {
-        console.error('Error loading data:', err);
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
+      .catch(err => console.error('Error loading data:', err))
+      .finally(() => this.isLoading = false);
   }
 
   filterCategory(category: any) {
@@ -87,13 +84,11 @@ export class HomeComponent implements OnInit {
           this.filteredProducts = productsRes.data.products || [];
           this.subcategories = subcategoriesRes.data || [];
         })
-        .catch((err) => {
+        .catch(err => {
           if (err.status === 404) this.subcategories = [];
           console.error('Error filtering category', err);
         })
-        .finally(() => {
-          this.isLoading = false;
-        });
+        .finally(() => this.isLoading = false);
     }
   }
 
@@ -105,31 +100,29 @@ export class HomeComponent implements OnInit {
     } else {
       this.isLoading = true;
       this.SubCategoriesService.getSubcategoryProducts(subcat.id).subscribe({
-        next: (response) => {
-          this.filteredProducts = response.data.products || [];
+        next: resp => {
+          this.filteredProducts = resp.data.products || [];
           this.isLoading = false;
         },
-        error: (err) => {
+        error: err => {
           console.error('Error fetching subcategory products', err);
           this.isLoading = false;
-        },
+        }
       });
     }
   }
 
   fetchAllSubcategories() {
     this.SubCategoriesService.getAllSubcategories().subscribe({
-      next: (response) => {
-        this.subcategories = response.data || [];
-      },
-      error: (err) => console.error('Error fetching subcategories', err),
+      next: resp => this.subcategories = resp.data || [],
+      error: err => console.error('Error fetching subcategories', err)
     });
   }
 
   getSubcategoriesForCategory(categoryName: string) {
     if (categoryName === 'All') return [];
     return this.subcategories.filter(
-      (subcat) => subcat.category?.name.toLowerCase() === categoryName.toLowerCase()
+      sc => sc.category?.name.toLowerCase() === categoryName.toLowerCase()
     );
   }
 
@@ -139,7 +132,7 @@ export class HomeComponent implements OnInit {
 
   getProductsForSubcategory(subcatName: string): any[] {
     return this.filteredProducts
-      .filter((p) => p.subcategory?.name === subcatName)
+      .filter(p => p.subcategory?.name === subcatName)
       .slice(0, this.visibleProductsCount);
   }
 
@@ -147,7 +140,7 @@ export class HomeComponent implements OnInit {
     this.visibleProductsCount += 15;
   }
 
-  trackByProductId(index: number, product: any) {
+  trackByProductId(_: number, product: any) {
     return product.id;
   }
 

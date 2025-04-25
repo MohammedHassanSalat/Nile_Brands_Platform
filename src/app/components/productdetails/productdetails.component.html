@@ -127,11 +127,30 @@
         </div>
         <div class="sticky bottom-0 bg-gray-50/95 backdrop-blur-sm py-4 -mx-4 px-4 border-t border-gray-100">
           <div class="flex flex-col gap-2">
-            <button class="w-full py-2.5 bg-primary text-white rounded-lg font-medium transition">
-              Add to Cart
+            <button (click)="toggleCartOrRedirect(product)" [class.opacity-50]="product.quantity === 0"
+              [class.cursor-not-allowed]="product.quantity === 0"
+              [class.bg-green-600]="cartService.isInCart(product.id)"
+              [class.hover\:bg-green-700]="cartService.isInCart(product.id)"
+              class="w-full py-2.5 text-white rounded-lg font-medium transition-all duration-300 relative" [ngClass]="{
+                'bg-primary hover:bg-primary-dark': !cartService.isInCart(product.id),
+                '!bg-green-600 hover:!bg-green-700': cartService.isInCart(product.id)
+              }" [disabled]="product.quantity === 0">
+
+              <span *ngIf="!cartService.isInCart(product.id)" class="animate-fade-in">
+                Add to Cart
+              </span>
+              <span *ngIf="cartService.isInCart(product.id)"
+                class="flex items-center justify-center gap-2 animate-fade-in">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Added to Cart
+              </span>
             </button>
-            <button
-              class="w-full py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition">
+
+            <button [class.opacity-50]="product.quantity === 0" [class.cursor-not-allowed]="product.quantity === 0"
+              class="w-full py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition"
+              [disabled]="product.quantity === 0">
               Buy Now
             </button>
           </div>

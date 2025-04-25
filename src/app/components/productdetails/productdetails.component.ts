@@ -7,8 +7,7 @@ import { AuthService } from '../../services/auth/auth.service';
 import { Observable, catchError, finalize } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { Product } from '../../interfaces/product';
-
-
+import { CartService } from '../../services/cart/cart.service';
 
 @Component({
   selector: 'app-productdetails',
@@ -40,7 +39,8 @@ export class ProductdetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private productsService: ProductsService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    public cartService: CartService
   ) {
     this.currentUser$ = this.authService.currentUser.asObservable();
   }
@@ -257,6 +257,27 @@ export class ProductdetailsComponent implements OnInit {
     this.selectedImage = this.productImages[(i - 1 + this.productImages.length) % this.productImages.length];
   }
 
+  isInCart(productId: string): boolean {
+    return this.cartService.isInCart(productId);
+  }
+
+  toggleCartOrRedirect(product: Product): void {
+    const token = localStorage.getItem('user');
+    if (!token) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+
+    if (this.cartService.isInCart(product.id)) {
+      this.router.navigate(['/cart']);
+    } else {
+      this.cartService.addToCart(product.id).subscribe({
+        next: () => this.cartService.loadCart(),
+        error: err => console.error('Error adding to cart', err)
+      });
+    }
+  }
+
   private handleError(message: string): void {
     this.error = message;
     this.isLoading = false;
@@ -277,4 +298,5 @@ export class ProductdetailsComponent implements OnInit {
         });
     }, 50);
   }
+
 }

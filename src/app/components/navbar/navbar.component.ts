@@ -1,15 +1,16 @@
-import {Component,ElementRef,ViewChild,HostListener,OnInit} from '@angular/core';
+import { Component, ElementRef, ViewChild, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth/auth.service';
+import { CartService } from '../../services/cart/cart.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
   profileImage = 'images/images ui/ProfileImg.png';
@@ -18,6 +19,7 @@ export class NavbarComponent implements OnInit {
   user: any = null;
   isDropdownOpen = false;
   authRestored = false;
+  cartCount = 0;
 
   @ViewChild('navbar') navbar!: ElementRef;
   private lastScrollTop = 0;
@@ -32,12 +34,16 @@ export class NavbarComponent implements OnInit {
     '/dashboard/hero',
     '/dashboard/addproduct',
     '/dashboard/profile',
-    '/dashboard/updatebrand',
+    '/dashboard/updatebrand'
   ];
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private cartService: CartService
+  ) {
     this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
+      .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         const url = this.router.url;
         const isExactHidden = this.hiddenExact.includes(url);
@@ -47,16 +53,16 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.currentUser.subscribe(user => (this.user = user));
-    this.authService
-      .isUserRestored()
-      .subscribe(restored => (this.authRestored = restored));
+    this.authService.currentUser.subscribe(user => this.user = user);
+    this.authService.isUserRestored().subscribe(restored => this.authRestored = restored);
+    this.cartService.cart$.subscribe(items => {
+      this.cartCount = items.reduce((sum, i) => sum + i.quantity, 0);
+    });
   }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
     if (this.hideNavbar || !this.navbar) return;
-
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     if (scrollTop > this.lastScrollTop) {
       this.navbar.nativeElement.classList.add('navbar-hidden');
@@ -75,6 +81,6 @@ export class NavbarComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.isDropdownOpen = false;
-    this.router.navigate(['/home']);
+    this.router.navigate(['/home']).then(() => window.location.reload());
   }
 }
