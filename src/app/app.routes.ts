@@ -18,6 +18,7 @@ import { AddproductComponent } from './components/brandDashboard/addproduct/addp
 import { ProfileComponent } from './components/brandDashboard/profile/profile.component';
 import { UpdatebrandComponent } from './components/brandDashboard/updatebrand/updatebrand.component';
 import { authGuard } from './guards/auth.guard';
+import { CheckoutComponent } from './components/checkout/checkout.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -67,6 +68,12 @@ export const routes: Routes = [
     component: CreatebrandComponent,
     canActivate: [authGuard],
     data: { roles: ['owner'] },
+  },
+  {
+    path: 'checkout',
+    component: CheckoutComponent,
+    canActivate: [authGuard],
+    data: { roles: ['user'] },
   },
   {
     path: 'dashboard',

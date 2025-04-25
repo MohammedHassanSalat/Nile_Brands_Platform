@@ -170,4 +170,19 @@ export class CartService {
         : item.product._id === productId
     );
   }
+
+  applyCoupon(couponCode: string): Observable<any> {
+    const token = localStorage.getItem('user');
+    if (!token) {
+      this.handleAuthError();
+      return throwError(() => new Error('Not authenticated'));
+    }
+    return this.http.put(
+      `${this.apiUrl}/api/v1/carts/applyCoupon`,
+      { name: couponCode },
+      { headers: { authorization: `Bearer ${token}` } }
+    ).pipe(
+      catchError(err => this.handleOperationError(err))
+    );
+  }
 }

@@ -93,7 +93,10 @@
               <button (click)="applyCoupon()"
                 class="px-6 py-2 bg-[#033555] text-white rounded-lg hover:bg-[#032a44] transition-colors">Apply</button>
             </div>
+            <div *ngIf="couponApplied" class="text-green-600 text-sm mt-2">Coupon applied successfully!</div>
+            <div *ngIf="couponError" class="text-red-600 text-sm mt-2">{{ couponError }}</div>
           </div>
+
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-primary">
             <h2 class="text-xl font-bold text-[#242526] mb-6">Order Summary</h2>

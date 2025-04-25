@@ -20,6 +20,8 @@ export class CartComponent implements OnInit {
   loading = true;
   cartItems: CartItem[] = [];
   couponCode = '';
+  couponError = '';
+  couponApplied = false;
   shippingCost = 0;
   discountAmount = 0;
   isUpdatingQuantity = false;
@@ -106,16 +108,40 @@ export class CartComponent implements OnInit {
     this.updateQuantity(item);
   }
 
+  applyCoupon(): void {
+    this.couponError = '';
+    this.couponApplied = false;
+
+    if (!this.couponCode) {
+      this.couponError = 'Please enter a coupon code';
+      return;
+    }
+
+    this.cartService.applyCoupon(this.couponCode).subscribe({
+      next: (res: any) => {
+        this.couponApplied = true;
+        this.couponError = '';
+        this.discountAmount = res.data.totalPrice - res.data.totalPriceAfterDiscount;
+        this.cartService.loadCart();
+      },
+      error: (err) => {
+        this.couponApplied = false;
+        this.discountAmount = 0;
+        if (err.error?.error?.message) {
+          this.couponError = err.error.error.message;
+        } else {
+          this.couponError = 'Failed to apply coupon';
+        }
+      }
+    });
+  }
+
   getSubtotal(): number {
     return this.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   }
 
   getTotal(): number {
     return this.getSubtotal() + this.shippingCost - this.discountAmount;
-  }
-
-  applyCoupon(): void {
-    this.discountAmount = this.getSubtotal() * 0.1;
   }
 
   onCheckout(): void {
