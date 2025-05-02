@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { GlobalService } from '../../services/global/global.service';
 import { CartService, CartState } from '../../services/cart/cart.service';
 import { CartItem, Product } from '../../interfaces/CartItem';
+import { OrderService } from '../../services/order/order.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-cart',
@@ -15,8 +17,6 @@ import { CartItem, Product } from '../../interfaces/CartItem';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CartComponent implements OnInit {
-  pay_1 = 'images/images ui/pay 1.png';
-  pay_2 = 'images/images ui/pay 2.png';
   loading = true;
   cartItems: CartItem[] = [];
   couponCode = '';
@@ -27,21 +27,15 @@ export class CartComponent implements OnInit {
   isUpdatingQuantity = false;
   quantityError = '';
   itemError = '';
-  private errorTimeout: any;
-  paymentInfo = {
-    email: '',
-    cardNumber: '',
-    expiry: '',
-    cvc: '',
-    cardholderName: '',
-    country: 'Egypt',
-    zip: ''
-  };
+  private errorTimeout: number = 0;
+  address = '';
+  pastOrders: any[] = [];
 
   constructor(
     private router: Router,
     public cartService: CartService,
     private globalService: GlobalService,
+    private orderService: OrderService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -51,6 +45,7 @@ export class CartComponent implements OnInit {
       this.router.navigate(['/signin']);
       return;
     }
+
     this.cartService.cart$.subscribe((state: CartState) => {
       if (this.loading) this.loading = false;
       this.cartItems = state.items;
@@ -59,6 +54,11 @@ export class CartComponent implements OnInit {
       this.cdr.markForCheck();
     });
     this.cartService.loadCart();
+
+    this.orderService.getUserOrders().subscribe(response => {
+      this.pastOrders = response.data || [];
+      this.cdr.markForCheck();
+    });
   }
 
   trackById(index: number, item: CartItem): string {
@@ -87,7 +87,7 @@ export class CartComponent implements OnInit {
 
   updateQuantity(item: CartItem): void {
     clearTimeout(this.errorTimeout);
-    const originalQuantity = item.quantity;
+    const original = item.quantity;
     this.isUpdatingQuantity = true;
     this.itemError = item._id;
     this.couponApplied = false;
@@ -101,10 +101,10 @@ export class CartComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: err => {
-        item.quantity = originalQuantity;
+        item.quantity = original;
         this.isUpdatingQuantity = false;
         this.quantityError = err.error?.error?.message || 'Failed to update quantity';
-        this.errorTimeout = setTimeout(() => {
+        this.errorTimeout = window.setTimeout(() => {
           this.quantityError = '';
           this.cdr.markForCheck();
         }, 5000);
@@ -118,15 +118,9 @@ export class CartComponent implements OnInit {
     item.quantity++;
     this.cdr.markForCheck();
     this.cartService.updateQuantity(item._id, item.quantity).subscribe({
-      next: () => { },
-      error: err => {
+      error: () => {
         item.quantity = original;
-        this.quantityError = err.error?.error?.message || 'Failed to update quantity';
         this.cdr.markForCheck();
-        setTimeout(() => {
-          this.quantityError = '';
-          this.cdr.markForCheck();
-        }, 5000);
       }
     });
   }
@@ -137,30 +131,38 @@ export class CartComponent implements OnInit {
     item.quantity--;
     this.cdr.markForCheck();
     this.cartService.updateQuantity(item._id, item.quantity).subscribe({
-      next: () => { },
-      error: err => {
+      error: () => {
         item.quantity = original;
-        this.quantityError = err.error?.error?.message || 'Failed to update quantity';
         this.cdr.markForCheck();
-        setTimeout(() => {
-          this.quantityError = '';
-          this.cdr.markForCheck();
-        }, 5000);
       }
     });
   }
 
+  private checkDifferentBrands(): boolean {
+    const brandIds = this.cartItems
+      .map(i => this.getProduct(i)?.brand?._id)
+      .filter(id => !!id) as string[];
+    return new Set<string>(brandIds).size > 1;
+  }
+
   applyCoupon(): void {
+    if (this.cartItems.length === 0) {
+      alert('Your cart is empty.');
+      return;
+    }
+    if (this.checkDifferentBrands()) {
+      alert('Coupons only apply when all products are from the same brand.');
+      return;
+    }
     this.couponError = '';
     this.couponApplied = false;
     this.cartService.applyCoupon(this.couponCode).subscribe({
       next: () => {
         this.couponApplied = true;
+        this.discountAmount = this.cartService['cartSubject'].getValue().discountAmount;
         this.cdr.markForCheck();
       },
       error: err => {
-        this.couponApplied = false;
-        this.discountAmount = 0;
         this.couponError = err.error?.error?.message || 'Failed to apply coupon';
         this.cdr.markForCheck();
       }
@@ -176,21 +178,17 @@ export class CartComponent implements OnInit {
   }
 
   onCheckout(): void {
-    if (this.validatePayment()) {
-      this.router.navigate(['/cart'], {
-        state: {
-          paymentInfo: this.paymentInfo,
-          totalAmount: this.getTotal()
-        }
-      });
+    if (!this.address.trim()) {
+      alert('Please enter a shipping address');
+      return;
     }
-  }
-
-  private validatePayment(): boolean {
-    const e = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.paymentInfo.email);
-    const c = this.paymentInfo.cardNumber.replace(/\s/g, '').length === 16;
-    const x = /^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(this.paymentInfo.expiry);
-    const v = /^\d{3,4}$/.test(this.paymentInfo.cvc);
-    return e && c && x && v && !!this.paymentInfo.cardholderName && !!this.paymentInfo.zip;
+    this.orderService.createOrder({ address: this.address }).subscribe({
+      next: () => this.router.navigate(['/orders']),
+      error: (err: HttpErrorResponse) => {
+        console.error('Order creation error:', err);
+        const msg = err.error?.error?.message || err.error?.message || err.message || 'Order creation failed';
+        alert(msg);
+      }
+    });
   }
 }
