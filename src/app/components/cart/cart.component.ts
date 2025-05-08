@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +20,7 @@ import { environment } from '../../environments/environment';
   styleUrls: ['./cart.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, AfterViewInit {
   loading = true;
   cartItems: CartItem[] = [];
   couponCode = '';
@@ -38,6 +38,8 @@ export class CartComponent implements OnInit {
   stripe: any;
   cardElement: any;
   userEmail = '';
+  private stripeInitialized = false;
+  @ViewChild('cardElement') cardElementRef!: ElementRef;
 
   constructor(
     private router: Router,
@@ -67,19 +69,41 @@ export class CartComponent implements OnInit {
       this.cartItems = state.items;
       this.couponCode = state.couponCode || '';
       this.discountAmount = state.discountAmount || 0;
+
+      if (!this.stripeInitialized && !this.loading && this.cartItems.length > 0) {
+        this.cdr.detectChanges();
+        this.initializeStripe();
+      }
+
       this.cdr.markForCheck();
     });
+
     this.cartService.loadCart();
 
     this.orderService.getUserOrders().subscribe(response => {
       this.pastOrders = response.data || [];
       this.cdr.markForCheck();
     });
+  }
 
+  ngAfterViewInit(): void {
+    if (!this.loading && this.cartItems.length > 0 && !this.stripeInitialized) {
+      this.cdr.detectChanges();
+      this.initializeStripe();
+    }
+  }
+
+  private async initializeStripe(): Promise<void> {
+    this.stripeInitialized = true;
     this.stripe = await loadStripe(environment.stripeKey);
     const elements = this.stripe.elements();
     this.cardElement = elements.create('card');
-    this.cardElement.mount('#card-element');
+
+    if (this.cardElementRef && this.cardElementRef.nativeElement) {
+      this.cardElement.mount(this.cardElementRef.nativeElement);
+    } else {
+      console.error('Card element not found in DOM');
+    }
   }
 
   trackById(index: number, item: CartItem): string {
