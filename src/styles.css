@@ -2,3 +2,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+/* You can add global styles to this file, and also import other style files */
+
+.StripeElement {
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background-color: white;
+    margin: 10px 0;
+}
+
+.StripeElement--focus {
+    border-color: #033555;
+    box-shadow: 0 0 0 2px rgba(3, 53, 85, 0.2);
+}
+
+.StripeElement--invalid {
+    border-color: #e63946;
+}
+
+.StripeElement--webkit-autofill {
+    background-color: #fefde5 !important;
+}
+
+/* Remove invalid aria-hidden property */
+/* Stripe handles accessibility automatically */

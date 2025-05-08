@@ -20,12 +20,11 @@ export class OrdersComponent implements OnInit {
     private orderService: OrderService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const token = localStorage.getItem('user');
     if (!token) {
-      // Not signed in, redirect
       this.router.navigate(['/signin']);
       return;
     }
@@ -41,6 +40,15 @@ export class OrdersComponent implements OnInit {
         this.loading = false;
         this.cdr.markForCheck();
       }
+    });
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   }
 }

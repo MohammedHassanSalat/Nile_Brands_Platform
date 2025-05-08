@@ -99,10 +99,25 @@
             <textarea id="shipping-address" [(ngModel)]="address" name="address" rows="3" required
               class="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#033555] placeholder-gray-400 transition-all"
               placeholder="Enter full shipping address"></textarea>
-            <button type="submit" [disabled]="checkoutForm.invalid"
-              class="w-full py-4 bg-gradient-to-r from-[#033555] to-[#032a44] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300">Pay
-              {{ getTotal() | number:'1.2-2' }} LE</button>
+
+            <div id="card-element" class="my-4 p-3 border rounded-lg border-[#E5E5E5]"></div>
+
+            <button type="submit" [disabled]="checkoutForm.invalid || processingPayment"
+              class="w-full py-4 bg-gradient-to-r from-[#033555] to-[#032a44] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+              <span *ngIf="!processingPayment">Pay {{ getTotal() | number:'1.2-2' }} LE</span>
+              <span *ngIf="processingPayment" class="flex items-center justify-center">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                  </path>
+                </svg>
+              </span>
+            </button>
           </form>
         </div>
       </div>
     </div>
+  </div>
+</div>

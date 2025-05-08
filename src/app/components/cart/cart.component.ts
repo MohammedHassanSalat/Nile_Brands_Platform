@@ -6,7 +6,11 @@ import { GlobalService } from '../../services/global/global.service';
 import { CartService, CartState } from '../../services/cart/cart.service';
 import { CartItem, Product } from '../../interfaces/CartItem';
 import { OrderService } from '../../services/order/order.service';
+import { PaymentService } from '../../services/payment/payment.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { loadStripe } from '@stripe/stripe-js';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-cart',
@@ -30,20 +34,32 @@ export class CartComponent implements OnInit {
   private errorTimeout: number = 0;
   address = '';
   pastOrders: any[] = [];
+  processingPayment = false;
+  stripe: any;
+  cardElement: any;
+  userEmail = '';
 
   constructor(
     private router: Router,
     public cartService: CartService,
     private globalService: GlobalService,
     private orderService: OrderService,
+    private paymentService: PaymentService,
     private cdr: ChangeDetectorRef
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const token = localStorage.getItem('user');
     if (!token) {
       this.router.navigate(['/signin']);
       return;
+    }
+
+    try {
+      const user = JSON.parse(token);
+      this.userEmail = user.email || '';
+    } catch {
+      this.userEmail = '';
     }
 
     this.cartService.cart$.subscribe((state: CartState) => {
@@ -59,6 +75,11 @@ export class CartComponent implements OnInit {
       this.pastOrders = response.data || [];
       this.cdr.markForCheck();
     });
+
+    this.stripe = await loadStripe(environment.stripeKey);
+    const elements = this.stripe.elements();
+    this.cardElement = elements.create('card');
+    this.cardElement.mount('#card-element');
   }
 
   trackById(index: number, item: CartItem): string {
@@ -70,9 +91,7 @@ export class CartComponent implements OnInit {
   }
 
   getImageUrl(image: string): string {
-    return image.startsWith('http')
-      ? image
-      : `${this.globalService.apiUrl}/products/${image}`;
+    return image.startsWith('http') ? image : `${this.globalService.apiUrl}/products/${image}`;
   }
 
   removeItem(itemId: string): void {
@@ -100,7 +119,7 @@ export class CartComponent implements OnInit {
         this.quantityError = '';
         this.cdr.markForCheck();
       },
-      error: err => {
+      error: (err: HttpErrorResponse) => {
         item.quantity = original;
         this.isUpdatingQuantity = false;
         this.quantityError = err.error?.error?.message || 'Failed to update quantity';
@@ -162,7 +181,7 @@ export class CartComponent implements OnInit {
         this.discountAmount = this.cartService['cartSubject'].getValue().discountAmount;
         this.cdr.markForCheck();
       },
-      error: err => {
+      error: (err: HttpErrorResponse) => {
         this.couponError = err.error?.error?.message || 'Failed to apply coupon';
         this.cdr.markForCheck();
       }
@@ -177,18 +196,83 @@ export class CartComponent implements OnInit {
     return this.getSubtotal() + this.shippingCost - this.discountAmount;
   }
 
-  onCheckout(): void {
-    if (!this.address.trim()) {
-      alert('Please enter a shipping address');
+  async onCheckout(): Promise<void> {
+    const cleanedAddress = this.address.trim();
+    if (!cleanedAddress || cleanedAddress.length < 10) {
+      alert('Please enter a valid shipping address (minimum 10 characters)');
       return;
     }
-    this.orderService.createOrder({ address: this.address }).subscribe({
-      next: () => this.router.navigate(['/orders']),
-      error: (err: HttpErrorResponse) => {
-        console.error('Order creation error:', err);
-        const msg = err.error?.error?.message || err.error?.message || err.message || 'Order creation failed';
-        alert(msg);
+    this.processingPayment = true;
+    this.cdr.markForCheck();
+    try {
+      const orderResponse = await firstValueFrom(
+        this.orderService.createOrder({ address: cleanedAddress })
+      );
+      if (!orderResponse?.data?._id) {
+        throw new Error(`Order creation failed. Server response:\n${JSON.stringify(orderResponse, null, 2)}`);
       }
-    });
+      const orderId = orderResponse.data._id;
+
+      const paymentIntentResponse = await firstValueFrom(
+        this.paymentService.createPaymentIntent(orderId)
+      );
+      if (!paymentIntentResponse?.clientSecret) {
+        throw new Error(`Payment initialization failed. Server response:\n${JSON.stringify(paymentIntentResponse, null, 2)}`);
+      }
+
+      const { error, paymentIntent } = await this.stripe.confirmCardPayment(
+        paymentIntentResponse.clientSecret,
+        {
+          payment_method: {
+            card: this.cardElement,
+            billing_details: { address: { line1: cleanedAddress } }
+          },
+          receipt_email: this.userEmail
+        }
+      );
+      if (error) {
+        throw new Error(`Stripe Error: ${error.message} (code: ${error.code})`);
+      }
+      if (!paymentIntentResponse.paymentIntentId) {
+        throw new Error('Payment confirmation data incomplete');
+      }
+
+      await firstValueFrom(
+        this.paymentService.confirmPayment(paymentIntentResponse.paymentIntentId)
+      );
+
+      await firstValueFrom(this.cartService.clearCart());
+
+      this.router.navigate(['/orders'], {
+        state: { paymentStatus: 'success', orderId: orderId }
+      });
+    } catch (err) {
+      console.error('Full checkout error:', err);
+      this.handlePaymentError(err);
+      this.cartService.loadCart();
+    } finally {
+      this.processingPayment = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  private handlePaymentError(err: unknown): void {
+    let errorMessage = 'Payment failed';
+    let technicalDetails = '';
+
+    if (err instanceof Error) {
+      errorMessage += `: ${err.message}`;
+      technicalDetails = err.stack || '';
+    } else if (typeof err === 'object' && err !== null) {
+      const httpError = err as any;
+      errorMessage += httpError?.error?.message
+        ? `: ${httpError.error.message}`
+        : httpError?.error?.error?.message
+          ? `: ${httpError.error.error.message}`
+          : ': Unknown server error';
+    }
+
+    console.error(`Payment Error Technical Details:\n${technicalDetails}`);
+    alert(`${errorMessage}\n\nPlease check your details and try again.`);
   }
 }
