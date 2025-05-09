@@ -24,8 +24,10 @@
               </svg>
             </button>
           </div>
-          <button class="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg hover:bg-red-50 transition">
-            <svg class="w-8 h-8 text-gray-600 hover:text-red-500" viewBox="0 0 24 24" fill="currentColor">
+          <button class="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg hover:bg-red-50 transition"
+            (click)="toggleWishlist()" [class.bg-red-100]="inWishlist" [class.text-red-500]="inWishlist"
+            [class.text-gray-600]="!inWishlist">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
@@ -244,10 +246,12 @@
             class="w-full h-12 py-2.5 bg-primary text-white rounded-lg font-medium flex items-center justify-center">
             <ng-container *ngIf="!isReviewOp">Submit Review</ng-container>
             <ng-container *ngIf="isReviewOp">
-              <div class="flex flex-col items-center justify-center space-y-1.5">
-                <svg class="w-6 h-6 animate-spin" viewBox="0 0 24 24">
+              <div class="flex items-center">
+                <svg class="animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                  </path>
                 </svg>
                 <span class="text-sm">Sending…</span>
               </div>
@@ -295,10 +299,10 @@
           </div>
           <div class="mt-4 flex items-center justify-between">
             <p class="text-lg font-bold text-primary">
-              {{ relatedProduct.price | currency:'EGP':'symbol':'1.0-0' }}
+              {{ relatedProduct.price }} LE
             </p>
             <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
-              (click)="$event.stopPropagation()">
+              (click)="toggleCartOrRedirect(relatedProduct); ">
               Add to Cart
             </button>
           </div>

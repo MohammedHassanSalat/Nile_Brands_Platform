@@ -26,7 +26,7 @@ export class CartComponent implements OnInit, AfterViewInit {
   couponCode = '';
   couponError = '';
   couponApplied = false;
-  shippingCost = 50;
+  shippingCost = 0;
   discountAmount = 0;
   isUpdatingQuantity = false;
   quantityError = '';
