@@ -1,0 +1,38 @@
+.border-dotted {
+    border-style: dotted;
+}
+
+.arrow-travel {
+    animation: travel 1.5s ease-in-out forwards;
+}
+
+@keyframes travel {
+    0% {
+        top: 0;
+        opacity: 1;
+    }
+
+    80% {
+        top: calc(100% - 1.5rem);
+        opacity: 1;
+    }
+
+    100% {
+        top: calc(100% - 1.5rem);
+        opacity: 0;
+    }
+}
+
+.w-10.h-10 {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.relative {
+    position: relative;
+}
+
+.arrow-travel {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}

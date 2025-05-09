@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { OrderService } from '../../services/order/order.service';
+import { OrderService, OrderResponse } from '../../services/order/order.service';
 
 @Component({
   selector: 'app-orders',
@@ -12,9 +12,13 @@ import { OrderService } from '../../services/order/order.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrdersComponent implements OnInit {
-  pastOrders: any[] = [];
+  pastOrders: OrderResponse[] = [];
   loading = true;
+  loadingMore = false;
   errorMsg = '';
+  page = 1;
+  limit = 15;
+  pagination = { currentPage: 1, totalPages: 1, next: null as number | null };
 
   constructor(
     private orderService: OrderService,
@@ -28,27 +32,47 @@ export class OrdersComponent implements OnInit {
       this.router.navigate(['/signin']);
       return;
     }
+    this.loadOrders();
+  }
 
-    this.orderService.getUserOrders().subscribe({
+  loadOrders(reset: boolean = true): void {
+    if (reset) {
+      this.page = 1;
+      this.pastOrders = [];
+      this.loading = true;
+    } else {
+      this.loadingMore = true;
+    }
+    this.orderService.getUserOrders(this.page, this.limit).subscribe({
       next: res => {
-        this.pastOrders = res.data || [];
+        const { data, pagination } = res;
+        this.pastOrders = reset ? data : [...this.pastOrders, ...data];
+        this.pagination = pagination;
         this.loading = false;
+        this.loadingMore = false;
         this.cdr.markForCheck();
       },
       error: err => {
         this.errorMsg = err.error?.error?.message || 'Failed to load orders';
         this.loading = false;
+        this.loadingMore = false;
         this.cdr.markForCheck();
       }
     });
   }
 
+  loadMore(): void {
+    if (!this.pagination.next) return;
+    this.page = this.pagination.next!;
+    this.loadOrders(false);
+  }
+
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  viewTracking(orderId: string): void {
+    this.router.navigate(['/trackorder', orderId]);
   }
 }

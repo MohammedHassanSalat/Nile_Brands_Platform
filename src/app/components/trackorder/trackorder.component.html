@@ -1,35 +1,42 @@
 <div class="flex flex-col gap-6 justify-center mx-auto min-h-screen max-w-[1200px]">
-  <div>
-    <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor">Track My Order</h2>
-  </div>
+  <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor mb-4">Track My Order</h2>
 
   <div class="p-6 bg-white shadow-md border rounded-lg border-fontColor flex gap-6">
-
-    <!-- Left Section (Timeline) -->
     <div class="flex flex-col items-center relative w-[80px] mt-5">
       <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center">
-        <div class="w-10 h-10 flex items-center justify-center text-[30px] text-primary font-[700] bg-[#b5b5b5] rounded-full border-2 border-primary"
-          [class.border-primary]="i < currentStep" [class.text-secondary]="i >= currentStep">
+        <div
+          class="w-10 h-10 flex items-center justify-center text-[30px] font-[700] rounded-full border-2 transition-colors duration-300"
+          [ngClass]="{
+            'bg-primary text-white border-primary': i <= currentStep,
+            'bg-[#b5b5b5] text-secondary border-gray-400': i > currentStep
+          }">
           {{ i + 1 }}
         </div>
-        <!-- <div *ngIf="i < steps.length - 1" [class.bg-primary]="i < currentStep" class="h-28 w-[3px] bg-primary"></div> -->
-        <div *ngIf="i < steps.length - 1" class="h-20 sm:h-28 w-[2px] border-l-4 border-dotted"
-          [ngClass]="{ 'border-primary': i < currentStep, 'border-gray-400': i >= currentStep }">
+        <div *ngIf="i < steps.length - 1" class="h-20 sm:h-28 w-[2px] border-dotted relative" [ngClass]="{
+            'border-primary': i < currentStep,
+            'border-gray-400': i >= currentStep
+          }">
+          <div *ngIf="i === currentStep - 1 && currentStep > 0 && currentStep < steps.length"
+            class="arrow-travel absolute left-1/2 transform -translate-x-1/2">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3">
+              </path>
+            </svg>
+          </div>
         </div>
-
       </div>
     </div>
-
-    <!-- Right Section (Order Status) -->
     <div class="flex flex-col gap-6">
       <div *ngFor="let step of steps; let i = index" class="flex items-center gap-12">
-        <img [src]="step.image" class="w-0 sm:w-[200px]" alt="Step Image">
+        <img [src]="step.image" class="w-0 sm:w-[200px]" alt="{{ step.title }}" />
         <div>
-          <p class="font-bold text-[18px]  sm:text-[20px]">{{ step.title }}</p>
+          <p class="font-bold text-[18px] sm:text-[20px]">{{ step.title }}</p>
           <p class="text-[16px] text-gray-600">{{ step.description }}</p>
         </div>
       </div>
+      <div *ngIf="currentStep > 0" class="mt-4 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg">
+        <p class="font-semibold">Status Update: {{ getStatusMessage() }}</p>
+      </div>
     </div>
-
   </div>
-</div>

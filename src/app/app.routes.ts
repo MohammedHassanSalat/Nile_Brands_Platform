@@ -55,7 +55,7 @@ export const routes: Routes = [
     data: { roles: ['user'] },
   },
   {
-    path: 'trackorder',
+    path: 'trackorder/:id',
     component: TrackorderComponent,
     canActivate: [authGuard],
     data: { roles: ['user'] },

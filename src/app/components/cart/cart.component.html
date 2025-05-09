@@ -1,3 +1,11 @@
+<div *ngIf="paymentSuccess" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+  <div class="bg-green-100 border border-green-400 text-green-700 text-3xl sm:text-5xl font-bold
+              px-12 py-8 rounded-2xl shadow-lg">
+    Payment Successful!
+  </div>
+</div>
+
+
 <div *ngIf="loading && !isUpdatingQuantity" class="flex items-center justify-center min-h-screen">
   <div class="animate-spin">
     <img src="images/images ui/nile brand.png" alt="Logo" class="w-40 h-40" />
@@ -32,17 +40,20 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-
           <ng-container *ngIf="getProduct(item) as product">
             <div class="flex gap-6">
               <img [src]="getImageUrl(product.coverImage)" [alt]="product.name"
                 class="w-32 h-32 object-cover rounded-lg" />
               <div class="flex-1 space-y-3">
-                <h3 class="text-lg font-semibold text-[#242526]">{{ product.name | slice:0:35 }}</h3>
+                <h3 class="text-lg font-semibold text-[#242526]">
+                  {{ product.name | slice:0:35 }}
+                </h3>
                 <p class="text-sm text-[#828282]">{{ product.category.name }}</p>
                 <p class="text-sm text-[#828282]">{{ product.brand.name }}</p>
                 <div class="flex items-center justify-between">
-                  <p class="text-xl font-bold text-[#033555]">{{ (item.price * item.quantity) | number:'1.2-2' }} LE</p>
+                  <p class="text-xl font-bold text-[#033555]">
+                    {{ (item.price * item.quantity) | number:'1.2-2' }} LE
+                  </p>
                   <div class="flex flex-col items-end space-y-2">
                     <div class="flex items-center gap-3">
                       <button (click)="decrementQuantity(item)"
@@ -62,7 +73,9 @@
                         </svg>
                       </button>
                     </div>
-                    <div *ngIf="itemError === item._id" class="text-red-600 text-xs">{{ quantityError }}</div>
+                    <div *ngIf="itemError === item._id" class="text-red-600 text-xs">
+                      {{ quantityError }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -71,52 +84,81 @@
         </div>
       </div>
 
-      <div class="lg:col-span-1 mt-8 lg:mt-0 space-y-6">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-primary">
-          <h3 class="text-lg font-semibold text-[#737373] mb-4">Apply Coupon</h3>
+      <div class="w-full max-w-md space-y-6">
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-[#033555]">
+          <h3 class="text-lg font-semibold text-[#828282] mb-4">Apply Coupon</h3>
           <div class="flex gap-3">
             <input type="text" [(ngModel)]="couponCode" placeholder="Enter coupon code"
-              class="flex-1 px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#033555]" />
+              class="flex-1 px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#033555] focus:border-[#033555] placeholder-[#0000009C] transition-all" />
             <button (click)="applyCoupon()"
-              class="px-6 py-2 bg-[#033555] text-white rounded-lg hover:bg-[#032a44] transition-colors">Apply</button>
+              class="px-6 py-3 bg-[#033555] text-white rounded-lg hover:bg-[#032a44] focus:ring-4 focus:ring-[#70CEAF] transition-all">
+              Apply
+            </button>
           </div>
           <div *ngIf="couponApplied" class="text-green-600 text-sm mt-2">Coupon applied successfully!</div>
           <div *ngIf="couponError" class="text-red-600 text-sm mt-2">{{ couponError }}</div>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-primary">
-          <h2 class="text-xl font-bold text-[#242526] mb-6">Order Summary</h2>
-          <div class="space-y-4">
-            <div class="flex justify-between"><span class="text-[#737373]">Subtotal</span><span
-                class="font-medium text-[#242526]">{{ getSubtotal() | number:'1.2-2' }} LE</span></div>
-            <div class="flex justify-between"><span class="text-[#737373]">Shipping</span><span
-                class="font-medium text-[#242526]">{{ shippingCost | number:'1.2-2' }} LE</span></div>
-            <div *ngIf="discountAmount > 0" class="flex justify-between"><span
-                class="text-[#737373]">Discount</span><span class="font-medium text-red-600">-{{ discountAmount |
-                number:'1.2-2' }} LE</span></div>
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-[#033555]">
+          <h2 class="text-2xl font-bold text-[#242526] mb-6">Order Summary</h2>
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span class="text-[#828282]">Subtotal</span>
+              <span class="font-medium text-[#242526]">{{ getSubtotal() | number:'1.2-2' }} LE</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-[#828282]">Shipping</span>
+              <span class="font-medium text-[#242526]">{{ shippingCost | number:'1.2-2' }} LE</span>
+            </div>
+            <div *ngIf="discountAmount > 0" class="flex justify-between text-sm">
+              <span class="text-[#828282]">Discount</span>
+              <span class="font-medium text-red-600">-{{ discountAmount | number:'1.2-2' }} LE</span>
+            </div>
+            <div class="flex justify-between text-base font-semibold pt-3 border-t border-[#E5E5E5]">
+              <span class="text-[#242526]">Total</span>
+              <span class="text-[#242526]">{{ getTotal() | number:'1.2-2' }} LE</span>
+            </div>
           </div>
-          <form (ngSubmit)="onCheckout()" #checkoutForm="ngForm" class="pt-4 border-t border-[#E5E5E5] mt-4 space-y-4">
-            <textarea id="shipping-address" [(ngModel)]="address" name="address" rows="3" required
-              class="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#033555] placeholder-gray-400 transition-all"
-              placeholder="Enter full shipping address"></textarea>
+        </div>
 
-            <div #cardElement class="my-4 p-3 border rounded-lg border-[#E5E5E5]"></div>
-
+        <div *ngIf="!paymentSuccess" class="bg-white p-6 rounded-xl shadow-lg border border-[#033555]">
+          <form (ngSubmit)="onCheckout()" #checkoutForm="ngForm" class="space-y-6">
+            <h2 class="text-2xl font-bold text-[#242526] mb-6">Payment Details</h2>
+            <div class="space-y-4">
+              <div>
+                <label for="cardholder-name" class="block text-sm font-bold text-primary mb-1">Cardholder Name</label>
+                <input id="cardholder-name" [(ngModel)]="cardholderName" name="cardholderName" type="text" required
+                  class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#033555] focus:border-[#033555] placeholder-[#0000009C] transition-all"
+                  placeholder="Name as on card" />
+              </div>
+              <div>
+                <label for="shipping-address" class="block text-sm font-bold text-primary mb-1">Shipping Address</label>
+                <textarea id="shipping-address" [(ngModel)]="address" name="address" rows="2" required
+                  class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#033555] focus:border-[#033555] placeholder-[#0000009C] transition-all resize-none"
+                  placeholder="Enter full shipping address"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-primary mb-1">Card Details</label>
+                <div #cardElement class="w-full p-3 border border-[#E5E5E5] rounded-lg bg-gray-50"></div>
+              </div>
+            </div>
             <button type="submit" [disabled]="checkoutForm.invalid || processingPayment"
-              class="w-full py-4 bg-gradient-to-r from-[#033555] to-[#032a44] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+              class="w-full py-3 bg-gradient-to-r from-[#033555] to-[#032a44] text-white rounded-lg font-semibold hover:from-[#032a44] hover:to-[#031c33] focus:ring-4 focus:ring-[#70CEAF] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
               <span *ngIf="!processingPayment">Pay {{ getTotal() | number:'1.2-2' }} LE</span>
-              <span *ngIf="processingPayment" class="flex items-center justify-center">
-                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+              <span *ngIf="processingPayment" class="flex items-center">
+                <svg class="animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
                   viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                   </path>
                 </svg>
+                Processing...
               </span>
             </button>
           </form>
         </div>
+
       </div>
     </div>
   </div>

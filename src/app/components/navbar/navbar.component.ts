@@ -35,7 +35,8 @@ export class NavbarComponent implements OnInit {
     '/dashboard/hero',
     '/dashboard/addproduct',
     '/dashboard/profile',
-    '/dashboard/updatebrand'
+    '/dashboard/updatebrand',
+    '/trackorder' 
   ];
 
   constructor(
@@ -45,9 +46,10 @@ export class NavbarComponent implements OnInit {
   ) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        const url = this.router.url;
-        const isExactHidden = this.hiddenExact.includes(url);
+      .subscribe((event: NavigationEnd) => {
+        const url = event.urlAfterRedirects.split('?')[0]; 
+        const baseUrl = url.split('/').slice(0, 2).join('/'); 
+        const isExactHidden = this.hiddenExact.includes(url) || this.hiddenExact.includes(baseUrl);
         const isProductDetail = url.startsWith('/products/');
         this.hideNavbar = isExactHidden || isProductDetail;
       });

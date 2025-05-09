@@ -26,19 +26,23 @@ export class CartComponent implements OnInit, AfterViewInit {
   couponCode = '';
   couponError = '';
   couponApplied = false;
-  shippingCost = 0;
+  shippingCost = 50;
   discountAmount = 0;
   isUpdatingQuantity = false;
   quantityError = '';
   itemError = '';
-  private errorTimeout: number = 0;
+  private errorTimeout = 0;
   address = '';
+  cardholderName = '';
   pastOrders: any[] = [];
   processingPayment = false;
+  paymentSuccess = false;
+  private orderId = '';
   stripe: any;
   cardElement: any;
   userEmail = '';
   private stripeInitialized = false;
+
   @ViewChild('cardElement') cardElementRef!: ElementRef;
 
   constructor(
@@ -56,7 +60,6 @@ export class CartComponent implements OnInit, AfterViewInit {
       this.router.navigate(['/signin']);
       return;
     }
-
     try {
       const user = JSON.parse(token);
       this.userEmail = user.email || '';
@@ -69,12 +72,10 @@ export class CartComponent implements OnInit, AfterViewInit {
       this.cartItems = state.items;
       this.couponCode = state.couponCode || '';
       this.discountAmount = state.discountAmount || 0;
-
-      if (!this.stripeInitialized && !this.loading && this.cartItems.length > 0) {
+      if (!this.stripeInitialized && this.cartItems.length > 0) {
         this.cdr.detectChanges();
         this.initializeStripe();
       }
-
       this.cdr.markForCheck();
     });
 
@@ -98,24 +99,9 @@ export class CartComponent implements OnInit, AfterViewInit {
     this.stripe = await loadStripe(environment.stripeKey);
     const elements = this.stripe.elements();
     this.cardElement = elements.create('card');
-
-    if (this.cardElementRef && this.cardElementRef.nativeElement) {
+    if (this.cardElementRef.nativeElement) {
       this.cardElement.mount(this.cardElementRef.nativeElement);
-    } else {
-      console.error('Card element not found in DOM');
     }
-  }
-
-  trackById(index: number, item: CartItem): string {
-    return item._id;
-  }
-
-  getProduct(item: CartItem): Product | null {
-    return typeof item.product === 'object' ? item.product : null;
-  }
-
-  getImageUrl(image: string): string {
-    return image.startsWith('http') ? image : `${this.globalService.apiUrl}/products/${image}`;
   }
 
   removeItem(itemId: string): void {
@@ -137,6 +123,7 @@ export class CartComponent implements OnInit, AfterViewInit {
     this.couponError = '';
     this.discountAmount = 0;
     this.cdr.markForCheck();
+
     this.cartService.updateQuantity(item._id, item.quantity).subscribe({
       next: () => {
         this.isUpdatingQuantity = false;
@@ -151,7 +138,6 @@ export class CartComponent implements OnInit, AfterViewInit {
           this.quantityError = '';
           this.cdr.markForCheck();
         }, 5000);
-        this.cdr.markForCheck();
       }
     });
   }
@@ -181,24 +167,21 @@ export class CartComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private checkDifferentBrands(): boolean {
-    const brandIds = this.cartItems
-      .map(i => this.getProduct(i)?.brand?._id)
-      .filter(id => !!id) as string[];
-    return new Set<string>(brandIds).size > 1;
-  }
-
   applyCoupon(): void {
     if (this.cartItems.length === 0) {
       alert('Your cart is empty.');
       return;
     }
-    if (this.checkDifferentBrands()) {
+    const brandIds = this.cartItems
+      .map(i => (i.product as Product)?.brand?._id)
+      .filter(Boolean) as string[];
+    if (new Set(brandIds).size > 1) {
       alert('Coupons only apply when all products are from the same brand.');
       return;
     }
     this.couponError = '';
     this.couponApplied = false;
+
     this.cartService.applyCoupon(this.couponCode).subscribe({
       next: () => {
         this.couponApplied = true;
@@ -210,6 +193,14 @@ export class CartComponent implements OnInit, AfterViewInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  getProduct(item: CartItem): Product | null {
+    return typeof item.product === 'object' ? item.product : null;
+  }
+
+  getImageUrl(image: string): string {
+    return image.startsWith('http') ? image : `${this.globalService.apiUrl}/products/${image}`;
   }
 
   getSubtotal(): number {
@@ -226,53 +217,54 @@ export class CartComponent implements OnInit, AfterViewInit {
       alert('Please enter a valid shipping address (minimum 10 characters)');
       return;
     }
+    if (!this.cardholderName.trim()) {
+      alert('Please enter cardholder name');
+      return;
+    }
     this.processingPayment = true;
     this.cdr.markForCheck();
+
     try {
       const orderResponse = await firstValueFrom(
         this.orderService.createOrder({ address: cleanedAddress })
       );
-      if (!orderResponse?.data?._id) {
-        throw new Error(`Order creation failed. Server response:\n${JSON.stringify(orderResponse, null, 2)}`);
-      }
-      const orderId = orderResponse.data._id;
+      this.orderId = orderResponse.data._id;
 
       const paymentIntentResponse = await firstValueFrom(
-        this.paymentService.createPaymentIntent(orderId)
+        this.paymentService.createPaymentIntent(this.orderId)
       );
-      if (!paymentIntentResponse?.clientSecret) {
-        throw new Error(`Payment initialization failed. Server response:\n${JSON.stringify(paymentIntentResponse, null, 2)}`);
-      }
 
-      const { error, paymentIntent } = await this.stripe.confirmCardPayment(
+      const { error } = await this.stripe.confirmCardPayment(
         paymentIntentResponse.clientSecret,
         {
           payment_method: {
             card: this.cardElement,
-            billing_details: { address: { line1: cleanedAddress } }
+            billing_details: {
+              address: { line1: cleanedAddress },
+              name: this.cardholderName
+            }
           },
           receipt_email: this.userEmail
         }
       );
-      if (error) {
-        throw new Error(`Stripe Error: ${error.message} (code: ${error.code})`);
-      }
-      if (!paymentIntentResponse.paymentIntentId) {
-        throw new Error('Payment confirmation data incomplete');
-      }
+      if (error) throw new Error(error.message);
 
       await firstValueFrom(
         this.paymentService.confirmPayment(paymentIntentResponse.paymentIntentId)
       );
-
       await firstValueFrom(this.cartService.clearCart());
 
-      this.router.navigate(['/orders'], {
-        state: { paymentStatus: 'success', orderId: orderId }
-      });
+      this.paymentSuccess = true;
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.router.navigate(['/orders'], {
+          state: { paymentStatus: 'success', orderId: this.orderId }
+        });
+      }, 2000);
     } catch (err) {
-      console.error('Full checkout error:', err);
-      this.handlePaymentError(err);
+      console.error(err);
+      alert('Payment failed. Please check your details and try again.');
       this.cartService.loadCart();
     } finally {
       this.processingPayment = false;
@@ -280,23 +272,9 @@ export class CartComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private handlePaymentError(err: unknown): void {
-    let errorMessage = 'Payment failed';
-    let technicalDetails = '';
-
-    if (err instanceof Error) {
-      errorMessage += `: ${err.message}`;
-      technicalDetails = err.stack || '';
-    } else if (typeof err === 'object' && err !== null) {
-      const httpError = err as any;
-      errorMessage += httpError?.error?.message
-        ? `: ${httpError.error.message}`
-        : httpError?.error?.error?.message
-          ? `: ${httpError.error.error.message}`
-          : ': Unknown server error';
-    }
-
-    console.error(`Payment Error Technical Details:\n${technicalDetails}`);
-    alert(`${errorMessage}\n\nPlease check your details and try again.`);
+  navigateToOrders(): void {
+    this.router.navigate(['/orders'], {
+      state: { paymentStatus: 'success', orderId: this.orderId }
+    });
   }
 }
