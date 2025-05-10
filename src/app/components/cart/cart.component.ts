@@ -42,6 +42,8 @@ export class CartComponent implements OnInit, AfterViewInit {
   cardElement: any;
   userEmail = '';
   private stripeInitialized = false;
+  country: string = 'United States'; // Added to fix undefined property error
+  zip: string = ''; // Added to fix undefined property error
 
   @ViewChild('cardElement') cardElementRef!: ElementRef;
 

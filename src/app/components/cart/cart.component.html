@@ -5,7 +5,6 @@
   </div>
 </div>
 
-
 <div *ngIf="loading && !isUpdatingQuantity" class="flex items-center justify-center min-h-screen">
   <div class="animate-spin">
     <img src="images/images ui/nile brand.png" alt="Logo" class="w-40 h-40" />
@@ -85,6 +84,7 @@
       </div>
 
       <div class="w-full max-w-md space-y-6">
+        <!-- Apply Coupon Section -->
         <div class="bg-white p-6 rounded-xl shadow-lg border border-[#033555]">
           <h3 class="text-lg font-semibold text-[#828282] mb-4">Apply Coupon</h3>
           <div class="flex gap-3">
@@ -99,6 +99,7 @@
           <div *ngIf="couponError" class="text-red-600 text-sm mt-2">{{ couponError }}</div>
         </div>
 
+        <!-- Order Summary Section -->
         <div class="bg-white p-6 rounded-xl shadow-lg border border-[#033555]">
           <h2 class="text-2xl font-bold text-[#242526] mb-6">Order Summary</h2>
           <div class="space-y-3">
@@ -121,33 +122,62 @@
           </div>
         </div>
 
+        <!-- Payment Form Section -->
         <div *ngIf="!paymentSuccess" class="bg-white p-6 rounded-xl shadow-lg border border-[#033555]">
-          <form (ngSubmit)="onCheckout()" #checkoutForm="ngForm" class="space-y-6">
-            <h2 class="text-2xl font-bold text-[#242526] mb-6">Payment Details</h2>
-            <div class="space-y-4">
-              <div>
-                <label for="cardholder-name" class="block text-sm font-bold text-primary mb-1">Cardholder Name</label>
-                <input id="cardholder-name" [(ngModel)]="cardholderName" name="cardholderName" type="text" required
-                  class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#033555] focus:border-[#033555] placeholder-[#0000009C] transition-all"
-                  placeholder="Name as on card" />
-              </div>
-              <div>
-                <label for="shipping-address" class="block text-sm font-bold text-primary mb-1">Shipping Address</label>
-                <textarea id="shipping-address" [(ngModel)]="address" name="address" rows="2" required
-                  class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#033555] focus:border-[#033555] placeholder-[#0000009C] transition-all resize-none"
-                  placeholder="Enter full shipping address"></textarea>
-              </div>
-              <div>
-                <label class="block text-sm font-bold text-primary mb-1">Card Details</label>
-                <div #cardElement class="w-full p-3 border border-[#E5E5E5] rounded-lg bg-gray-50"></div>
-              </div>
+          <h2 class="text-2xl font-bold text-[#242526] mb-6">Payment Form</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-1 text-gray-600">Email</label>
+              <input type="email" [(ngModel)]="userEmail"
+                class="w-full border-gray-300 px-3 py-2 rounded focus:outline-none text-sm"
+                placeholder="example@gmail.com" required />
             </div>
-            <button type="submit" [disabled]="checkoutForm.invalid || processingPayment"
-              class="w-full py-3 bg-gradient-to-r from-[#033555] to-[#032a44] text-white rounded-lg font-semibold hover:from-[#032a44] hover:to-[#031c33] focus:ring-4 focus:ring-[#70CEAF] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+            <div>
+              <label class="block text-sm font-medium mb-1 text-gray-600">Card information</label>
+              <div class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50" #cardElement></div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1 text-gray-600">Cardholder name</label>
+              <input type="text" [(ngModel)]="cardholderName"
+                class="w-full border-gray-300 px-3 py-2 rounded focus:outline-none text-sm"
+                placeholder="Full name on card" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1 text-gray-600">Shipping address</label>
+              <textarea [(ngModel)]="address" rows="2"
+                class="w-full border-gray-300 px-3 py-2 rounded focus:outline-none text-sm resize-none"
+                placeholder="Street address" required></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1 text-gray-600">Country or region</label>
+              <select [(ngModel)]="country" class="w-full border-gray-300 px-3 py-2 rounded focus:outline-none text-sm">
+                <option value="United States">United States</option>
+                <option value="Canada">Canada</option>
+                <option value="Egypt">Egypt</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Australia">Australia</option>
+                <option value="Germany">Germany</option>
+                <option value="France">France</option>
+                <option value="Japan">Japan</option>
+                <option value="China">China</option>
+                <option value="India">India</option>
+                <option value="Brazil">Brazil</option>
+                <option value="South Africa">South Africa</option>
+                <option value="Mexico">Mexico</option>
+                <option value="Russia">Russia</option>
+                <option value="Italy">Italy</option>
+                <option value="Spain">Spain</option>
+                <option value="South Korea">South Korea</option>
+                <option value="Argentina">Argentina</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="Sweden">Sweden</option>
+              </select>
+            </div>
+            <button type="button" (click)="onCheckout()" [disabled]="processingPayment"
+              class="w-full py-3 bg-[#033555] text-white rounded-lg font-semibold hover:bg-[#032a44] focus:ring-4 focus:ring-[#70CEAF] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
               <span *ngIf="!processingPayment">Pay {{ getTotal() | number:'1.2-2' }} LE</span>
-              <span *ngIf="processingPayment" class="flex items-center">
-                <svg class="animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                  viewBox="0 0 24 24">
+              <span *ngIf="processingPayment" class="flex items-center justify-center">
+                <svg class="animate-spin h-5 w-5 text-white mr-2" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
@@ -156,10 +186,9 @@
                 Processing...
               </span>
             </button>
-          </form>
+            <p class="text-xs mt-2 ml-8 text-gray-500">
+              By clicking Pay, you agree to the Link Terms and Privacy Policy.
+            </p>
+          </div>
         </div>
-
       </div>
-    </div>
-  </div>
-</div>
