@@ -13,7 +13,7 @@ export class AuthService {
   }
 
   currentUser = new BehaviorSubject<any>(null);
-  private isRestored = new BehaviorSubject<boolean>(false); // Tracks restoration
+  private isRestored = new BehaviorSubject<boolean>(false);
 
   getLoggedUser(): Observable<any> {
     const url = `${this.globalService.apiUrl}/api/v1/users/me`;

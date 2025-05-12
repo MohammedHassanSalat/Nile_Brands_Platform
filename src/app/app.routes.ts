@@ -22,14 +22,25 @@ import { OrdersComponent } from './components/orders/orders.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent },
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [authGuard]
+  },
   { path: 'register', component: SignupComponent },
   { path: 'forgetpassword', component: ForgetPasseordComponent },
   { path: 'resetpassword', component: ResetPasswordComponent },
   { path: 'verifyemail', component: VerifyemailComponent },
-  { path: 'signin', component: LoginComponent },
-
-
+  {
+    path: 'signin',
+    component: LoginComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'products/:id',
+    component: ProductdetailsComponent,
+    canActivate: [authGuard]
+  },
   {
     path: 'wishlist',
     component: WishlistComponent,
@@ -61,16 +72,11 @@ export const routes: Routes = [
     data: { roles: ['user'] },
   },
   {
-    path: 'products/:id',
-    component: ProductdetailsComponent,
-  },
-  {
     path: 'createbrand',
     component: CreatebrandComponent,
     canActivate: [authGuard],
     data: { roles: ['owner'] },
   },
-
   {
     path: 'orders',
     component: OrdersComponent,
