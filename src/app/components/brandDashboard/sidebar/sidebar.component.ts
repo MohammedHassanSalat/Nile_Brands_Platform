@@ -1,6 +1,8 @@
 import { AfterViewInit, Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
 import { initFlowbite } from 'flowbite';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,7 +12,20 @@ import { initFlowbite } from 'flowbite';
   styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent implements AfterViewInit {
+  isDropdownOpen = false;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
+
   ngAfterViewInit() {
-    initFlowbite(); // Initializes Flowbite dropdowns after view is ready
+    initFlowbite();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.isDropdownOpen = false;
+    this.router.navigate(['/home']).then(() => window.location.reload());
   }
 }

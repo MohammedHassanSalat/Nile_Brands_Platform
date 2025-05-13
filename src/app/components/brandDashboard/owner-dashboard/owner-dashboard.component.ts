@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from "../sidebar/sidebar.component";
 
 @Component({
@@ -7,7 +7,7 @@ import { SidebarComponent } from "../sidebar/sidebar.component";
   standalone: true,
   imports: [RouterOutlet, SidebarComponent],
   templateUrl: './owner-dashboard.component.html',
-  styleUrl: './owner-dashboard.component.css'
+  styleUrls: ['./owner-dashboard.component.css']
 })
 export class OwnerDashboardComponent {
 
