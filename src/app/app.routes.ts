@@ -45,55 +45,55 @@ export const routes: Routes = [
     path: 'wishlist',
     component: WishlistComponent,
     canActivate: [authGuard],
-    data: { roles: ['user'] },
+    data: { roles: ['user'] }
   },
   {
     path: 'cart',
     component: CartComponent,
     canActivate: [authGuard],
-    data: { roles: ['user'] },
+    data: { roles: ['user'] }
   },
   {
     path: 'editprofile',
     component: EditprofileComponent,
     canActivate: [authGuard],
-    data: { roles: ['user'] },
+    data: { roles: ['user'] }
   },
   {
     path: 'feedback',
     component: FeedbackComponent,
     canActivate: [authGuard],
-    data: { roles: ['user'] },
+    data: { roles: ['user'] }
   },
   {
     path: 'trackorder/:id',
     component: TrackorderComponent,
     canActivate: [authGuard],
-    data: { roles: ['user'] },
+    data: { roles: ['user'] }
   },
   {
     path: 'createbrand',
     component: CreatebrandComponent,
     canActivate: [authGuard],
-    data: { roles: ['owner'] },
+    data: { roles: ['owner'] }
   },
   {
     path: 'orders',
     component: OrdersComponent,
     canActivate: [authGuard],
-    data: { roles: ['user'] },
+    data: { roles: ['user'] }
   },
   {
     path: 'dashboard',
+    component: OwnerDashboardComponent,
     canActivate: [authGuard],
     data: { roles: ['owner'] },
-    component: OwnerDashboardComponent,
     children: [
       { path: 'hero', component: HeroComponent },
       { path: 'addproduct', component: AddproductComponent },
       { path: 'profile', component: ProfileComponent },
-      { path: 'updatebrand', component: UpdatebrandComponent },
-    ],
+      { path: 'updatebrand', component: UpdatebrandComponent }
+    ]
   },
-  { path: '**', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home', pathMatch: 'full' }
 ];

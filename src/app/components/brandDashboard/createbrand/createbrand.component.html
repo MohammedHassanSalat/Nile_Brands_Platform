@@ -1,45 +1,98 @@
-<div class="flex flex-wrap justify-center items-center gap-8 mt-[55px] px-4 md:px-0">
-  <div class="relative w-full max-w-[480px] md:w-auto">
-    <img class="w-full max-w-[480px]" src="images/images ui/authnilebrand.png">
-    <img class="absolute w-[120px] inset-0 top-[40%] mx-auto" src="images/images ui/nile brand.png">
-  </div>
-  <div class="w-full h-[600px] max-w-[375px] p-6">
-    <div>
-      <h2 class="text-[28px] md:text-[35px] font-[700] text-fontColor text-center md:text-left">Create Brand</h2>
+<div *ngIf="loading || success" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+  <ng-container *ngIf="loading; else successTpl " class="flex items-center justify-center min-h-screen">
+    <div class="animate-spin" role="status">
+      <img src="images/images ui/nile brand.png" alt="Logo" class="w-40 h-40"  />
+    </div>
+  </ng-container>
+
+  <ng-template #successTpl>
+    <div class="bg-green-100 border border-green-400 text-green-700 text-3xl sm:text-5xl font-bold
+                px-16 py-8 rounded-2xl shadow-lg animate-pulse">
+      Brand Created!
+    </div>
+  </ng-template>
+</div>
+
+<div [class.opacity-50]="loading || success" class="min-h-screen flex flex-col items-center p-4">
+  <div class="flex flex-wrap justify-center items-start gap-8 mt-[55px] w-full max-w-6xl">
+    <div class="relative flex-1 max-w-[480px]">
+      <img class="w-full h-auto rounded-lg shadow-xl" src="images/images ui/authnilebrand.png" alt="Brand illustration">
+      <img class="absolute w-[120px] inset-0 top-[40%] mx-auto" src="images/images ui/nile brand.png"
+        alt="Nile Brand Logo">
     </div>
 
-    <form class="mt-6">
-      <div class="mt-6 flex flex-col items-center">
-        <div class="w-[90px] h-[90px]">
-          <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
+
+    <div class="flex-1 max-w-[480px]">
+      <h2 class="text-[35px] font-[700] text-fontColor text-center mb-8">Create Brand</h2>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6">
+        <div *ngIf="errorMsg" class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+          {{ errorMsg }}
         </div>
-        <p class="text-fontColor text-[20px]">logo</p>
-      </div>
 
-      <div class="relative mt-6">
-        <label for="brandname"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Name</label>
-        <input type="text" id="brandname" placeholder="Handmade Creations"
-          class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-gray-300 placeholder:text-placeholder" />
-      </div>
+        <div class="flex flex-col items-center">
+          <label class="cursor-pointer group">
+            <div class="w-[90px] h-[90px] relative">
+              <div class="w-full h-full rounded-full overflow-hidden bg-gray-100">
+                <ng-container *ngIf="previewUrl; else uploadContent">
+                  <img [src]="previewUrl" class="w-full h-full object-cover" alt="Brand logo preview" />
+                </ng-container>
 
-      <div class="relative mt-6">
-        <label for="description"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">description</label>
-        <input type="text" id="description" placeholder="A brand showcasing unique handmade crafts from Egypt"
-          class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-gray-300 placeholder:text-placeholder" />
-      </div>
+                <ng-template #uploadContent>
+                
+                </ng-template>
+              </div>
+              <div
+                class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+            </div>
+            <input type="file" (change)="onFileChange($event)" accept="image/*" class="hidden"
+              aria-label="Upload brand logo" />
+          </label>
+          <p class="text-fontColor text-[20px] mt-2">logo</p>
+        </div>
 
-      <div class="relative mt-6">
-        <label for="taxID"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">taxID</label>
-        <input type="text" id="taxID" placeholder="12345789"
-          class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-gray-300 placeholder:text-placeholder" />
-      </div>
+        <div class="space-y-6 mt-6">
+          <div class="relative">
+            <label for="brandname"
+              class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">
+              Name
+            </label>
+            <input formControlName="name" type="text" id="brandname" placeholder="Handmade Creations" class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-gray-300
+                          placeholder:text-placeholder focus:ring-2 focus:ring-primary" />
+          </div>
 
-      <div class="mt-8 text-center">
-        <button class="w-[50%] px-6 py-2 text-[16px] md:text-[20px] text-white bg-primary rounded-full">Submit</button>
-      </div>
-    </form>
+          <div class="relative">
+            <label for="description"
+              class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">
+              Description
+            </label>
+            <input formControlName="description" type="text" id="description"
+              placeholder="A brand showcasing unique handmade crafts from Egypt" class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-gray-300
+                          placeholder:text-placeholder focus:ring-2 focus:ring-primary" />
+          </div>
+
+          <div class="relative">
+            <label for="taxID"
+              class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">
+              Tax ID
+            </label>
+            <input formControlName="taxID" type="text" id="taxID" placeholder="12345789" class="block w-full px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-gray-300
+                          placeholder:text-placeholder focus:ring-2 focus:ring-primary" />
+          </div>
+        </div>
+
+        <div class="mt-8 text-center">
+          <button type="submit" [disabled]="form.invalid || loading || success" class="w-[50%] px-6 py-2 text-[16px] md:text-[20px] text-white bg-primary rounded-full
+                         hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
