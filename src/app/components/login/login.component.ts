@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 })
 export class LoginComponent {
   constructor(private AuthService: AuthService, private Router: Router) { }
+
   loginForm = new FormGroup({
     email: new FormControl(null, [Validators.required, Validators.email]),
     password: new FormControl(null, [Validators.required]),
@@ -34,13 +35,8 @@ export class LoginComponent {
             localStorage.setItem('user', res.token);
             this.AuthService.getLoggedUser().subscribe({
               next: (userRes) => {
-                const role = userRes.data?.role;
                 this.AuthService.currentUser.next(userRes.data);
-                if (role === 'user') {
-                  this.Router.navigate(['/home']);
-                } else if (role === 'owner') {
-                  this.Router.navigate(['/dashboard/hero']);
-                }
+                this.Router.navigate(['/home']);
               },
               error: (err) => {
                 console.error('Error fetching user data:', err);
@@ -50,7 +46,7 @@ export class LoginComponent {
           }
         },
         error: (err) => {
-          this.invalidLoginMsg =  err.error?.error?.message || 'Login failed.';
+          this.invalidLoginMsg = err.error?.error?.message || 'Login failed.';
         },
       });
     }

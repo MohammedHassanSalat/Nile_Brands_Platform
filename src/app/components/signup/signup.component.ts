@@ -17,7 +17,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './signup.component.css',
 })
 export class SignupComponent {
-  constructor(private AuthService: AuthService, private Router: Router) {}
+  constructor(private AuthService: AuthService, private Router: Router) { }
+
   signupForm = new FormGroup({
     name: new FormControl(null, [Validators.required]),
     email: new FormControl(null, [Validators.required, Validators.email]),
@@ -37,16 +38,8 @@ export class SignupComponent {
         next: (res) => {
           if (res.token) {
             localStorage.setItem('user', res.token);
-            if (res.data?.role) {
-              this.AuthService.currentUser.next(res.data);
-              if (res.data?.role === 'user') {
-                this.Router.navigate(['/home']);
-              } else if (res.data?.role === 'owner') {
-                this.Router.navigate(['/createbrand']);
-              } else {
-                this.Router.navigate(['/home']);
-              }
-            }
+            this.AuthService.currentUser.next(res.data);
+            this.Router.navigate(['/home']);
           }
         },
         error: (err) => {

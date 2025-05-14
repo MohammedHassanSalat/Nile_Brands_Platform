@@ -8,33 +8,23 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   return authService.isUserRestored().pipe(
-    switchMap(restored => {
+    switchMap((restored) => {
       if (!restored) {
         return authService.restoreUser().then(() => authService.currentUser);
       }
       return authService.currentUser;
     }),
-    map(user => {
-      const allowedRoles = (route.data?.['roles'] as string[]) || [];
-      if (allowedRoles.length === 0) {
-        if (user?.role === 'owner') {
-          router.navigate(['/dashboard/hero'], { replaceUrl: true });
-          return false;
-        }
-        return true;
-      }
+    map((user) => {
       if (!user) {
-        router.navigate(['/home'], { replaceUrl: true });
+        router.navigate(['/home']);
         return false;
       }
-      if (allowedRoles.includes(user.role)) {
+
+      const allowedRoles = (route.data?.['roles'] as string[]) || [];
+      if (allowedRoles.length === 0 || allowedRoles.includes(user.role)) {
         return true;
       }
-      if (user.role === 'owner' || user.role === 'admin') {
-        router.navigate(['/dashboard/hero'], { replaceUrl: true });
-      } else {
-        router.navigate(['/home'], { replaceUrl: true });
-      }
+      router.navigate(['/home']);
       return false;
     })
   );

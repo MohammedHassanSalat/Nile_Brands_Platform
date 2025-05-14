@@ -57,13 +57,18 @@
       </div>
 
       <div class="mt-4">
-        <label for="role" class="block mb-2 text-[16px] md:text-[20px] text-fontColor">Role</label>
-        <select id="role" formControlName="role"
-          class="w-[50%] text-fontColor text-[16px] md:text-[20px] rounded-lg block p-2.5 border border-gray-300">
-          <option selected value="user">User</option>
-          <option value="owner">Owner</option>
-        </select>
+        <input type="hidden" formControlName="role" value="user" />
+        <p class="text-[16px] md:text-[20px] text-fontColor">
+          Role: <strong>User</strong>
+        </p>
+        <p class="mt-2 text-sm text-gray-600">
+          If you want to be an owner, go to the
+          <a routerLink="/owner" class="text-primary underline">
+            Owner Platform
+          </a>.
+        </p>
       </div>
+
 
       <div class="mt-4">
         <button type="submit" [disabled]="signupForm.invalid"
