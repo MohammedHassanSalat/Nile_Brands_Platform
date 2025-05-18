@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth/auth.service';
+import { UserService } from '../../services/user/user.service';
 import { CartService, CartState } from '../../services/cart/cart.service';
 import { CartItem } from '../../interfaces/CartItem';
 
@@ -36,19 +37,20 @@ export class NavbarComponent implements OnInit {
     '/dashboard/addproduct',
     '/dashboard/profile',
     '/dashboard/updatebrand',
-    '/trackorder' 
+    '/trackorder'
   ];
 
   constructor(
     private router: Router,
     private authService: AuthService,
+    private userService: UserService,
     private cartService: CartService
   ) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        const url = event.urlAfterRedirects.split('?')[0]; 
-        const baseUrl = url.split('/').slice(0, 2).join('/'); 
+        const url = event.urlAfterRedirects.split('?')[0];
+        const baseUrl = url.split('/').slice(0, 2).join('/');
         const isExactHidden = this.hiddenExact.includes(url) || this.hiddenExact.includes(baseUrl);
         const isProductDetail = url.startsWith('/products/');
         this.hideNavbar = isExactHidden || isProductDetail;
@@ -56,8 +58,15 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.currentUser.subscribe(user => this.user = user);
+    this.authService.currentUser.subscribe(user => {
+      this.user = user;
+      if (user && user.userImage) {
+        this.profileImage = this.userService.getUserImageUrl(user.userImage);
+      }
+    });
+
     this.authService.isUserRestored().subscribe(restored => this.authRestored = restored);
+
     this.cartService.cart$.subscribe((state: CartState) => {
       this.cartCount = state.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0);
     });

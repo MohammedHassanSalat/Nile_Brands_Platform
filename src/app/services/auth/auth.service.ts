@@ -13,7 +13,7 @@ export class AuthService {
   }
 
   currentUser = new BehaviorSubject<any>(null);
-  private isRestored = new BehaviorSubject<boolean>(false); // Tracks restoration
+  private isRestored = new BehaviorSubject<boolean>(false);
 
   getLoggedUser(): Observable<any> {
     const url = `${this.globalService.apiUrl}/api/v1/users/me`;
@@ -60,9 +60,10 @@ export class AuthService {
     return this.http.post<any>(url, formData);
   }
 
+
   forgetPassword(email: string): Observable<any> {
     const url = `${this.globalService.apiUrl}/api/v1/auth/forgetPassword`;
-    return this.http.post<any>(url, email);
+    return this.http.post<any>(url, { email });
   }
 
   verifyResetCode(resetCode: string): Observable<any> {

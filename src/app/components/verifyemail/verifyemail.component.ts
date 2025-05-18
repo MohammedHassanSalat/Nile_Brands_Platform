@@ -1,12 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
-import {
-  ReactiveFormsModule,
-  FormGroup,
-  FormControl,
-  Validators,
-} from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { interval, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -15,76 +10,43 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './verifyemail.component.html',
-  styleUrl: './verifyemail.component.css',
+  styleUrls: ['./verifyemail.component.css']
 })
 export class VerifyemailComponent implements OnInit, OnDestroy {
-  constructor(private authService: AuthService, private Router:Router) {}
-
   verifyForm = new FormGroup({
-    code1: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    code2: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    code3: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    code4: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    code5: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    code6: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
+    code1: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    code2: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    code3: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    code4: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    code5: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    code6: new FormControl('', { nonNullable: true, validators: [Validators.required] })
   });
+  errorMessage = '';
+  timeLeft = 600;
+  timerDisplay = '10:00';
+  private timerSub: Subscription | null = null;
+  private email = localStorage.getItem('resetEmail') || '';
 
-  errorMessage: string = '';
-  timeLeft: number = 600; // 10 minutes in seconds
-  timerSubscription: Subscription | null = null;
-  timerDisplay: string = '10:00';
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
-    this.initializeTimer();
-  }
-
-  ngOnDestroy() {
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
-    }
-  }
-
-  initializeTimer() {
-    const startTime = localStorage.getItem('verificationStartTime');
-    const maxTime = 600; // 10 minutes in seconds
-
-    if (startTime) {
-      const elapsed = Math.floor((Date.now() - parseInt(startTime)) / 1000);
-      this.timeLeft = Math.max(maxTime - elapsed, 0);
+    const start = localStorage.getItem('verificationStartTime');
+    const max = 600;
+    if (start) {
+      const elapsed = Math.floor((Date.now() - +start) / 1000);
+      this.timeLeft = Math.max(max - elapsed, 0);
     } else {
       localStorage.setItem('verificationStartTime', Date.now().toString());
     }
-
     if (this.timeLeft > 0) {
-      this.timerSubscription = interval(1000).subscribe(() => {
-        if (this.timeLeft > 0) {
-          this.timeLeft--;
-          const minutes = Math.floor(this.timeLeft / 60);
-          const seconds = this.timeLeft % 60;
-          this.timerDisplay = `${minutes.toString().padStart(2, '0')}:${seconds
-            .toString()
-            .padStart(2, '0')}`;
-        } else {
-          this.timerSubscription?.unsubscribe();
+      this.timerSub = interval(1000).subscribe(() => {
+        this.timeLeft--;
+        const m = Math.floor(this.timeLeft / 60);
+        const s = this.timeLeft % 60;
+        this.timerDisplay = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        if (this.timeLeft <= 0) {
           this.errorMessage = 'Verification code has expired';
+          this.timerSub?.unsubscribe();
         }
       });
     } else {
@@ -93,22 +55,55 @@ export class VerifyemailComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngOnDestroy() {
+    this.timerSub?.unsubscribe();
+  }
+
   verifyEmail() {
-    const resetCode: string = Object.values(this.verifyForm.value).join('');
-    if (resetCode.length !== 6 || !/^\d{6}$/.test(resetCode)) {
-      this.errorMessage = 'Please enter a valid 6-digit code';
+    const code = Object.values(this.verifyForm.value).join('');
+    if (!/^\d{6}$/.test(code)) {
+      this.errorMessage = 'Please enter a valid 6‑digit code';
       return;
     }
-
     this.errorMessage = '';
-    this.authService.verifyResetCode(resetCode).subscribe({
-      next: () => {
-        this.Router.navigate(['/resetpassword']);
-      },
-      error: (err) => {
-        this.errorMessage =
-          err.error?.error?.message || 'Invalid or expired code';
-      },
+    this.authService.verifyResetCode(code).subscribe({
+      next: () => this.router.navigate(['/resetpassword']),
+      error: err => this.errorMessage = err.error?.error?.message || 'Invalid or expired code'
     });
+  }
+
+  resendCode() {
+    if (!this.email) return;
+    this.authService.forgetPassword(this.email).subscribe({
+      next: res => {
+        localStorage.setItem('resetToken', res.resetToken);
+        localStorage.setItem('verificationStartTime', Date.now().toString());
+        this.timeLeft = 600;
+        this.timerDisplay = '10:00';
+        this.errorMessage = '';
+        this.timerSub?.unsubscribe();
+        this.ngOnInit();
+      },
+      error: () => {
+        this.errorMessage = 'Unable to resend code. Try again later.';
+      }
+    });
+  }
+
+  autoFocusNext(event: Event, next: HTMLInputElement) {
+    const input = event.target as HTMLInputElement;
+    if (input.value.length === 1 && next) {
+      next.focus();
+    }
+  }
+
+  autoFocusPrev(event: KeyboardEvent, prev: HTMLInputElement | null) {
+    if (event.key === 'Backspace') {
+      const input = event.target as HTMLInputElement;
+      if (!input.value && prev) {
+        prev.focus();
+        event.preventDefault();
+      }
+    }
   }
 }

@@ -7,7 +7,7 @@ import { LoginComponent } from './components/login/login.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { CartComponent } from './components/cart/cart.component';
 import { VerifyemailComponent } from './components/verifyemail/verifyemail.component';
-import { EditprofileComponent } from './components/editprofile/editprofile.component';
+import { ProfileComponent } from './components/editprofile/editprofile.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { TrackorderComponent } from './components/trackorder/trackorder.component';
 import { ProductdetailsComponent } from './components/productdetails/productdetails.component';
@@ -38,7 +38,7 @@ export const routes: Routes = [
   },
   {
     path: 'editprofile',
-    component: EditprofileComponent,
+    component: ProfileComponent,
     canActivate: [authGuard],
     data: { roles: ['user'] },
   },

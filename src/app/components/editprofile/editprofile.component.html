@@ -1,42 +1,148 @@
-<div class="flex flex-col gap-4 justify-center mx-auto  min-h-screen max-w-[1200px]">
-  <div>
-    <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor">Edit profile</h2>
+<div class="flex flex-col gap-4 max-w-[900px] my-[5%] sm:max-w-[800px] sm:ml-28">
+  <h2 class="text-[25px] sm:text-[30px] font-[700] text-fontColor mt-7">Edit Profile</h2>
+
+
+  <div *ngIf="loadingProfile || loadingPwd"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div class="animate-spin" role="status">
+      <img src="images/images ui/nile brand.png" alt="Logo" class="w-40 h-40" />
+    </div>
   </div>
+
 
   <div class="p-6 bg-white shadow-md border rounded-lg border-fontColor">
     <div class="mt-6">
-      <div class="w-[100px] h-[100px]">
-        <img src="images/images ui/ProfileImg.png" class="w-full h-full rounded-full" alt="Profile Image">
+      <div class="w-[100px] h-[100px] rounded-full overflow-hidden bg-gray-100">
+        <img *ngIf="previewUrl; else placeholder" [src]="previewUrl" class="w-full h-full object-cover"
+          alt="Profile Image" />
+        <ng-template #placeholder>
+          <img src="images/images ui/ProfileImg.png" class="w-full h-full object-cover" alt="Profile Image" />
+        </ng-template>
       </div>
     </div>
 
-    <form class="mt-6">
-      <div class="relative">
-        <label for="username"
+
+    <form [formGroup]="profileForm" (ngSubmit)="submitProfile()" class="mt-6">
+      <div *ngIf="errorProfile" class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+        {{ errorProfile }}
+      </div>
+      <div class="mt-4">
+        <label class="cursor-pointer inline-block mt-2">
+          <span class="px-4 py-2 bg-primary text-white rounded">Change Image</span>
+          <input type="file" (change)="onFileChange($event)" accept="image/*" class="hidden" />
+        </label>
+      </div>
+
+      <div class="relative mt-7">
+        <label for="name"
           class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Name</label>
-        <input type="text" id="username"
-          class="block max-sm:w-full sm:w-[50%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
+        <input formControlName="name" id="name" type="text"
+          class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 bg-white rounded-lg border border-fontColor" />
       </div>
 
-      <div class="relative mt-4">
-        <label for="email"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">E-mail</label>
-        <input type="email" id="email"
-          class="block max-sm:w-full sm:w-[50%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
-      </div>
-
-      <div class="relative mt-4">
-        <label for="password"
-          class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">Password</label>
-        <input type="password" id="password"
-          class="block max-sm:w-full sm:w-[50%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor" />
-      </div>
-
+ 
       <div class="mt-6 sm:text-right">
-        <button class="px-12 py-2 text-[16px] text-white bg-primary rounded-[16px]">
-          Save Changes
+        <button type="submit" [disabled]="loadingProfile"
+          class="px-12 py-2 text-[16px] text-white bg-primary rounded-[16px]">
+          {{ loadingProfile ? 'Saving…' : 'Save Changes' }}
         </button>
+      </div>
+
+      <div *ngIf="successProfile" class="mt-4 text-green-600 font-bold">
+        Profile updated!
       </div>
     </form>
   </div>
-</div>
+
+  <div class="p-6 bg-white shadow-md border rounded-lg border-fontColor mt-6">
+    <h3 class="text-xl font-semibold mb-4">Change Password</h3>
+
+    <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
+      <div *ngIf="errorPwd" class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+        {{ errorPwd }}
+      </div>
+
+            <div class="relative">
+              <label for="currentPassword"
+                class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">
+                Current Password
+              </label>
+              <input formControlName="currentPassword" [type]="showCurrentPassword ? 'text' : 'password'" id="currentPassword"
+                class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 mt-2 bg-white rounded-lg border border-fontColor pr-10" />
+              <button type="button" (click)="togglePasswordVisibility('current')"
+                class="absolute right-60 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <svg *ngIf="!showCurrentPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg *ngIf="showCurrentPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.157-3.523M6.9 6.9A9.955 9.955 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.957 9.957 0 01-1.944 3.429" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+                </svg>
+              </button>
+            </div>
+            
+            <div class="relative mt-4">
+              <label for="password" class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">
+                New Password
+              </label>
+              <input formControlName="password" [type]="showNewPassword ? 'text' : 'password'" id="password"
+                class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 bg-white rounded-lg border border-fontColor pr-10" />
+              <button type="button" (click)="togglePasswordVisibility('new')"
+                class="absolute right-60 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <svg *ngIf="!showNewPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg *ngIf="showNewPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.157-3.523M6.9 6.9A9.955 9.955 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.957 9.957 0 01-1.944 3.429" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+                </svg>
+              </button>
+            </div>
+            
+            <div class="relative mt-4">
+              <label for="confirmPassword"
+                class="absolute left-4 top-[-15px] text-[16px] md:text-[20px] text-fontColor bg-white px-1">
+                Confirm Password
+              </label>
+              <input formControlName="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword"
+                class="block max-sm:w-full sm:w-[70%] px-4 pt-2 pb-2 bg-white rounded-lg border border-fontColor pr-10" />
+              <button type="button" (click)="togglePasswordVisibility('confirm')"
+                class="absolute right-60 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <svg *ngIf="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg *ngIf="showConfirmPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.157-3.523M6.9 6.9A9.955 9.955 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.957 9.957 0 01-1.944 3.429" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+                </svg>
+              </button>
+            </div>
+            
+            <div class="mt-6 sm:text-right">
+              <button type="submit" [disabled]="loadingPwd" class="px-12 py-2 text-[16px] text-white bg-primary rounded-[16px]">
+                {{ loadingPwd ? 'Changing…' : 'Change Password' }}
+              </button>
+            </div>
+            
+            <div *ngIf="successPwd" class="mt-4 text-green-600 font-bold">
+              Password changed!
+            </div>
+            </form>
+            </div>
+            </div>
+      
