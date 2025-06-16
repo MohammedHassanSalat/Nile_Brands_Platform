@@ -21,8 +21,8 @@ export interface User {
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'https://nile-brands-backend.up.railway.app/api/v1';
-  private staticUrl = 'https://nile-brands-backend.up.railway.app';
+  private apiUrl = 'https://nile-brands.up.railway.app/api/v1';
+  private staticUrl = 'https://nile-brands.up.railway.app';
 
   constructor(private http: HttpClient) { }
 
