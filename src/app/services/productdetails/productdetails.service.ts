@@ -52,7 +52,7 @@ export class ProductsService {
   }
 
   getProductImageUrl(image: string): string {
-    if (!image) return 'assets/images/placeholder-product.jpg';
+    if (!image) return 'images/images ui/authnilebrand.png';
     if (image.startsWith('http')) return image;
     return `${this.globalService.apiUrl}/products/${image}`;
   }

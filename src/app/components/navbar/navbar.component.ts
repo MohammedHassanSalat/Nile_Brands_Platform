@@ -33,9 +33,7 @@ export class NavbarComponent implements OnInit {
   private lastScrollTop = 0;
   private hiddenExact = [
     '/signin', '/resetpassword', '/forgetpassword', '/register',
-    '/verifyemail', '/createbrand', '/dashboard', '/dashboard/hero',
-    '/dashboard/addproduct', '/dashboard/profile', '/dashboard/updatebrand',
-    '/trackorder'
+    '/verifyemail', '/chat','/trackorder',
   ];
 
   constructor(

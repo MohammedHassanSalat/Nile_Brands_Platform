@@ -13,6 +13,7 @@ import { TrackorderComponent } from './components/trackorder/trackorder.componen
 import { ProductdetailsComponent } from './components/productdetails/productdetails.component';
 import { authGuard } from './guards/auth.guard';
 import { OrdersComponent } from './components/orders/orders.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -61,6 +62,12 @@ export const routes: Routes = [
   {
     path: 'orders',
     component: OrdersComponent,
+    canActivate: [authGuard],
+    data: { roles: ['user'] },
+  },
+  {
+    path: 'chat',
+    component: ChatComponent,
     canActivate: [authGuard],
     data: { roles: ['user'] },
   },
